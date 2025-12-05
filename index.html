@@ -1,413 +1,1364 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Igreja do Evangelho Quadrangular - Olaria 2</title>
-    
-    <!--  CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Igreja - Galeria & Admin</title>
 
-   
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            scroll-behavior: smooth;
-            background-color: #f4f1ee;
-        }
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-        .hero-gradient {
-            background: linear-gradient(135deg, rgba(244, 241, 238, 0.85), rgba(126, 86, 182, 0.6)), url('https://i.pinimg.com/736x/d2/69/0a/d2690a7428ca8b7291ea2e74aa5c4202.jpg');
-            background-size: cover;
-            background-position: top;
-        }
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-        .section-title {
-            @apply text-4xl md:text-5xl font-bold text-gray-800 mb-4 text-center;
-        }
-        .section-subtitle {
-            @apply text-center text-lg text-gray-600 mb-16 max-w-3xl mx-auto;
-        }
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-        .doctrine-card {
-            @apply bg-white rounded-2xl shadow-lg p-8 text-center transform hover:scale-105 hover:shadow-2xl transition-all duration-300;
-        }
-        .doctrine-icon {
-            @apply text-6xl mb-6 mx-auto;
-        }
+  <!-- SheetJS for Excel import -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-        .section-bg-alt {
-            background-color: #fdfcfb;
-        }
-        
-        
-        .reveal {
-            position: relative;
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f4f1ee;
+      color: #111827;
+    }
 
-        .reveal.active {
-            transform: translateY(0px);
-            opacity: 1;
-        }
+    .hero {
+      background: linear-gradient(135deg, rgba(244, 241, 238, 0.9), rgba(126, 86, 182, 0.2)), url('https://i.pinimg.com/736x/d2/69/0a/d2690a7428ca8b7291ea2e74aa5c4202.jpg');
+      background-size: cover;
+      background-position: center;
+    }
 
-     
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-        .content-fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+    .masonry {
+      column-gap: 1rem;
+      width: 100%;
+    }
+
+    @media (min-width:640px) {
+      .masonry {
+        column-count: 2;
+      }
+    }
+
+    @media (min-width:1024px) {
+      .masonry {
+        column-count: 3;
+      }
+    }
+
+    .masonry-item {
+      display: inline-block;
+      width: 100%;
+      margin: 0 0 1rem;
+      break-inside: avoid;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+    }
+
+    .masonry-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .album-card {
+      width: 220px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .15s;
+    }
+
+    .album-card:hover {
+      transform: translateY(-6px);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 80;
+      padding: 1rem;
+    }
+
+    .modal-content {
+      max-width: 1100px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: auto;
+      border-radius: 12px;
+      background: white;
+      padding: 1rem;
+    }
+
+    .admin-badge {
+      position: fixed;
+      right: 1rem;
+      bottom: 1rem;
+      background: #111827;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 999px;
+      z-index: 90;
+      display: none;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+  </style>
 </head>
-<body class="text-gray-800">
 
-   
-    <div id="main-site">
-        <!-- ======================= Cabeçalho) ======================= -->
-        <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
-            <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
-                <a href="#" class="flex items-center">
-                    <img src="logo.png" alt="Logo da IEQ" class="h-16 md:h-20 transition-transform hover:scale-110">
-                </a>
+<body>
+  <div id="main-site">
 
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#sobre" class="text-gray-700 hover:text-red-600 font-medium transition-colors text-lg">Sobre</a>
-                    <a href="#doutrina" class="text-gray-700 hover:text-red-600 font-medium transition-colors text-lg">Doutrina</a>
-                    <a href="#horarios" class="text-gray-700 hover:text-red-600 font-medium transition-colors text-lg">Programação</a>
-                    <a href="#galeria" class="text-gray-700 hover:text-red-600 font-medium transition-colors text-lg"> Galeria</a>
-                    <a href="#declaracao" class="text-gray-700 hover:text-red-600 font-medium transition-colors text-lg">Declaração de Fé</a>
-                     <a href="#aniversariantes" class="text-gray-700 hover:text-red-600 font-medium transition-colors text-lg"> Aniversariantes</a>
-                    <a href="#contato" class="text-gray-700 hover:text-red-600 font-medium transition-colors text-lg">Contato</a>
-                    <a href="https://www.instagram.com/ieqolaria2/" target="_blank" class="bg-gradient-to-r from-pink-500 to-orange-400 text-white px-5 py-2 rounded-full hover:shadow-lg hover:scale-105 transition-all font-semibold">
-                        <i class="fab fa-instagram mr-2"></i>Instagram
-                    </a>
-                </div>
+    <!-- LOGIN MODAL (visible) -->
+    <div id="loginModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-100 hidden">
+      <div class="bg-white rounded-xl shadow-xl p-6 w-[360px]">
+        <h2 class="text-xl font-bold mb-2 text-center">Acesso do Administrador</h2>
+        <p class="text-sm text-gray-600 mb-4 text-center">Insira o CPF e a senha para logar.</p>
 
-                <div class="md:hidden">
-                    <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
-                        <i class="fas fa-bars fa-2x"></i>
-                    </button>
-                </div>
-            </nav>
+        <input id="adminCpfInput" type="text" placeholder="CPF do admin" class="w-full p-3 border rounded mb-2" />
 
-            <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
-                <a href="#sobre" class="block px-6 py-4 text-gray-700 hover:bg-gray-100 font-medium">Sobre Nós</a>
-                <a href="#doutrina" class="block px-6 py-4 text-gray-700 hover:bg-gray-100 font-medium">Nossa Doutrina</a>
-                <a href="#horarios" class="block px-6 py-4 text-gray-700 hover:bg-gray-100 font-medium">Programação</a>
-                <a href="#galeria" class="block px-6 py-4 text-gray-700 hover:bg-gray-100 font-medium">Galeria</a>
-                <a href="#declaracao" class="block px-6 py-4 text-gray-700 hover:bg-gray-100 font-medium">Declaração de Fé</a>
-               <a href="#aniversariantes" class="block px-6 py-4 text-gray-700 hover:bg-gray-100 font-medium"> Aniversariantes</a>
-                <a href="#contato" class="block px-6 py-4 text-gray-700 hover:bg-gray-100 font-medium">Contato</a>
-                <a href="https://www.instagram.com/ieqolaria2/" target="_blank" class="block px-6 py-4 text-pink-600 hover:bg-gray-100 font-medium">
-                    <i class="fab fa-instagram mr-2"></i>Instagram
-                </a>
-            </div>
-        </header>
+        <input id="adminPasswordInput" type="password" placeholder="Senha do admin"
+          class="w-full p-3 border rounded mb-4" />
 
-        <!-- ======================= Menu ======================= -->
-        <main>
-            <!-- Cabecalho -->
-            <section class="hero-gradient pt-28 pb-32 md:pt-40 md:pb-48">
-                <div class="container mx-auto px-6 text-center">
-                    <h1 class="text-5xl md:text-7xl font-extrabold text-gray-900 mb-6 leading-tight">Bem-vindo à IEQ Olaria II</h1>
-                    <p class="text-xl md:text-2xl text-gray-800 mb-12 max-w-4xl mx-auto"> Venha nos visitar e fazer parte da nossa família.</p>
-                    <a href="#horarios" class="bg-purple-600 text-white px-10 py-4 rounded-full text-xl font-bold hover:bg-red-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
-                        Participe de um Culto
-                    </a>
-                </div>
-            </section>
-
-            <!-- Sobre Nós  -->
-            <section id="sobre" class="py-24 md:py-32 reveal">
-                <div class="container mx-auto px-6">
-                    <h2 class="section-title">Sobre Nossa Igreja</h2>
-                    <p class="section-subtitle">Conheça um pouco da nossa história e da nossa missão.</p>
-                    <div class="flex flex-col lg:flex-row items-center gap-16">
-                        <div class="lg:w-1/2">
-                            <img src="https://scontent.fipn1-1.fna.fbcdn.net/v/t51.82787-15/536420472_18320172322211962_8100673854223650046_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=127cfc&_nc_ohc=OnGzYrY_qE4Q7kNvwG8kBB3&_nc_oc=AdkXCYOffOYlqLnwfzUlHM_wvL_YBc46lXToacE1Tf7ZS8snZ6hyeZJenwuHKEPEF2Y&_nc_zt=23&_nc_ht=scontent.fipn1-1.fna&_nc_gid=rpDdeFTxKmEfBDBwgIwBQQ&oh=00_AfbR4PxwQcJ6XpgEekx5EpWqGE1szFUShIltRJntL5mDLA&oe=68C36BF5" alt="Comunidade da igreja" class="rounded-2xl shadow-2xl w-full transform hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <div class="lg:w-1/2 text-lg text-gray-700 space-y-6 text-justify leading-relaxed">
-                            <p>A Igreja do Evangelho do Evangelho Quadrangular, sede de Timóteo,  é uma igreja cheia de vida e acolhedora, dedicada a comunicar o evangelho de Jesus Cristo. Nossa missão é servir a Deus e à nossa comunidade com amor, compaixão e dedicação.</p>
-                            <p>Liderados pelos nossos pastores e superintendentes Deywson e Sônia Andrade, buscamos ser um farol de esperança e um ponto de apoio para todos que nos procuram. Cremos em um Deus que salva, cura, batiza com o Espírito Santo e que em breve voltará.</p>
-                            <p>Nossas portas estão sempre abertas. Sinta-se em casa para adorar a Deus conosco e crescer na fé.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Doutrina -->
-            <section id="doutrina" class="py-24 md:py-32 section-bg-alt reveal">
-                <div class="container mx-auto px-6">
-                    <h2 class="section-title">A Doutrina Quadrangular</h2>
-                    <p class="section-subtitle">Nossa fé é fundamentada em quatro pilares essenciais do ministério de Jesus Cristo.</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10">
-                        <div class="doctrine-card">
-                            <i class="fas fa-cross doctrine-icon" style="color: #d9534f;"></i>
-                            <h3 class="text-3xl font-bold mb-4 text-gray-800">Jesus Salva</h3>
-                            <p class="text-gray-600 text-lg leading-relaxed">Cremos que Jesus Cristo morreu na cruz para nos salvar, oferecendo perdão e vida eterna a todos que creem. (João 3:16)</p>
-                        </div>
-                        <div class="doctrine-card">
-                            <i class="fas fa-dove doctrine-icon" style="color: #f0ad4e;"></i>
-                            <h3 class="text-3xl font-bold mb-4 text-gray-800">Jesus Batiza</h3>
-                            <p class="text-gray-600 text-lg leading-relaxed">Cremos no batismo com o Espírito Santo que nos capacita para servir a Deus com poder e ousadia. (Atos 1:8)</p>
-                        </div>
-                        <div class="doctrine-card">
-                            <i class="fas fa-solid fa-trophy doctrine-icon" style="color: #5bc0de;"></i>
-                            <h3 class="text-3xl font-bold mb-4 text-gray-800">Jesus Cura</h3>
-                            <p class="text-gray-600 text-lg leading-relaxed">Cremos que Jesus tem o poder de curar nossos corpos, almas e espíritos, trazendo restauração completa. (Isaías 53:5)</p>
-                        </div>
-                        <div class="doctrine-card">
-                            <i class="fas fa-crown doctrine-icon" style="color: #8A2BE2;"></i>
-                            <h3 class="text-3xl font-bold mb-4 text-gray-800">Jesus Voltará</h3>
-                            <p class="text-gray-600 text-lg leading-relaxed">Cremos na segunda vinda de Jesus, quando Ele retornará em glória para buscar a Sua Igreja. (1 Tessalonicenses 4:16-17)</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Horários  -->
-            <section id="horarios" class="py-24 md:py-32 reveal">
-                <div class="container mx-auto px-6">
-                    <h2 class="section-title">Programação da Semana</h2>
-                    <p class="section-subtitle">Junte-se a nós em nossos cultos e reuniões. Você é nosso convidado especial!</p>
-                    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden mt-10">
-                        <ul class="divide-y divide-gray-200">
-                            <li class="p-8 flex flex-col sm:flex-row justify-between items-center hover:bg-red-50 transition-colors duration-300">
-                                <div>
-                                    <p class="text-2xl font-bold text-red-600">Culto de Domingo</p>
-                                    <p class="text-gray-600 text-lg mt-1">Uma celebração especial de louvor e adoração.</p>
-                                </div>
-                                <p class="text-xl font-semibold text-gray-800 mt-4 sm:mt-0">Domingo, 08:00h e 19:30h</p>
-                            </li>
-                            <li class="p-8 flex flex-col sm:flex-row justify-between items-center hover:bg-red-50 transition-colors duration-300">
-                                <div>
-                                    <p class="text-2xl font-bold text-red-600">Escola Dominical</p>
-                                    <p class="text-gray-600 text-lg mt-1">Uma manhã para aprender mais da palavra de Deus.</p>
-                                </div>
-                                <p class="text-xl font-semibold text-gray-800 mt-4 sm:mt-0">Domingo, 08:00h</p>
-                            </li>
-                            <li class="p-8 flex flex-col sm:flex-row justify-between items-center hover:bg-blue-50 transition-colors duration-300">
-                                <div>
-                                    <p class="text-2xl font-bold text-blue-600">Quarta de Guerra</p>
-                                    <p class="text-gray-600 text-lg mt-1">Tempo de busca da presença de Deus e comunhão</p>
-                                </div>
-                                <p class="text-xl font-semibold text-gray-800 mt-4 sm:mt-0">Quarta-feira, 08:00h e 19:30h</p>
-                            </li>
-                            <li class="p-8 flex flex-col sm:flex-row justify-between items-center hover:bg-yellow-50 transition-colors duration-300">
-                                <div>
-                                    <p class="text-2xl font-bold text-yellow-600">Oração</p>
-                                    <p class="text-gray-600 text-lg mt-1">Uma noite de fé, clamor e manifestação do poder de Deus.</p>
-                                </div>
-                                <p class="text-xl font-semibold text-gray-800 mt-4 sm:mt-0">Quinta, 19:30h</p>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-            
-            
-
-            <!-- Galeria  -->
-            <section id="galeria" class="py-24 md:py-32 section-bg-alt reveal">
-                <div class="container mx-auto px-6 text-center">
-                    <h2 class="section-title"> Fotos</h2>
-                    <p class="section-subtitle"> Veja os registros de momentos especiais</p>
-                    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl p-8 text-left mt-10">
-                        <h3 class="text-3xl font-bold text-gray-800 mb-4">GALERIA EM BREVE</h3>
-                        
-                    </div>
-                </div>
-            </section>
-
-            <!-- Declaração da Fé  -->
-            <section id="declaracao" class="py-24 md:py-32 section-bg-alt reveal">
-                <div class="container mx-auto px-6 text-center">
-                    <h2 class="section-title">Declaração de Fé</h2>
-                    <p class="section-subtitle">Conheça a nossa declaração de fé e se torne um membro.</p>
-                    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl p-8 text-left mt-10">
-                        <h3 class="text-3xl font-bold text-gray-800 mb-4">Declaração de fé - Quadrangular</h3>
-                        <img src="declaracao.png" alt="Banner do curso de discipulado" class="w-full h-auto rounded-xl mb-6">
-                        <p class="text-lg text-gray-700 mb-6">Uma apostila fundamental para todos que desejam firmar os primeiros passos na fé e se tornar um membro. Explore as doutrinas essenciais da vida cristã de forma clara e prática.</p>
-                        <button id="start-discipleship-btn" class="w-full bg-blue-600 text-white px-8 py-4 rounded-xl text-xl font-bold hover:bg-blue-700 transition-all transform hover:scale-105 shadow-lg">
-                            Acessar declaração de fé
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-             <!-- Aniversariantes  -->
-            <section id="aniversariantes" class="py-24 md:py-32 section-bg-alt reveal">
-                <div class="container mx-auto px-6 text-center">
-                    <h2 class="section-title">Aniversariantes do mês</h2>
-                    <p class="section-subtitle"> Veja os aniversariantes do mês</p>
-                    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl p-8 text-left mt-10">
-                        <h3 class="text-3xl font-bold text-gray-800 mb-4">ANIVERSARIANTES EM BREVE</h3>
-                        
-                    </div>
-                </div>
-            </section>
-
-            <!-- Contato e Localização  -->
-            <section id="contato" class="py-24 md:py-32 reveal">
-                <div class="container mx-auto px-6">
-                    <h2 class="section-title">Visite-nos</h2>
-                    <p class="section-subtitle">Será uma alegria receber você e sua família em nossa casa.</p>
-                    <div class="flex flex-col lg:flex-row gap-10 items-center">
-                        <div class="lg:w-1/2 w-full h-96 md:h-[500px] rounded-2xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-500">
-                            <iframe 
-                                src="https://maps.google.com/maps?q=Rua%2059%2C%2045%20Olaria%202%2C%20Tim%C3%B3teo%20MG&t=&z=17&ie=UTF8&iwloc=&output=embed"
-                                width="100%" 
-                                height="400" 
-                                style="border:0;" 
-                                allowfullscreen="" 
-                                loading="lazy" 
-                                referrerpolicy="no-referrer-when-downgrade">
-                            </iframe>
-                        </div>
-                        <div class="lg:w-1/2 w-full">
-                            <div class="bg-white p-10 rounded-2xl shadow-2xl">
-                                <h3 class="text-4xl font-bold mb-8 text-gray-800">IEQ Olaria II</h3>
-                                <div class="space-y-6">
-                                    <p class="flex items-start text-lg">
-                                        <i class="fas fa-map-marker-alt w-6 text-blue-600 mt-1"></i>
-                                        <span class="ml-4">  Rua 59, numero 45, Olaria2 - Timoteo MG </span>
-                                    </p>
-                                    <p class="flex items-center text-lg">
-                                        <i class="fas fa-phone w-6 text-blue-600"></i>
-                                        <span class="ml-4">(31) 3848-2880</span>
-                                    </p>
-                                    <div class="pt-6">
-                                        <h4 class="font-bold text-xl mb-3 text-gray-800">Siga-nos no Instagram:</h4>
-                                        <a href="https://www.instagram.com/ieqolaria2/" target="_blank" class="text-lg text-pink-600 hover:underline font-semibold">
-                                            @ieqolaria2
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- ======================= Rodaé ======================= -->
-        <footer class="bg-gray-800 text-white py-12">
-            <div class="container mx-auto px-6 text-center">
-                <img src="/logo.png" alt="Logo IEQ Olaria" class="h-24 mx-auto mb-5"/>
-                <p class="text-base text-gray-300">&copy;  Igreja do Evangelho Quadrangular - Olaria 2.</p>
-                <p class="text-gray-400">Todos os direitos reservados.</p>
-            </div>
-        </footer>
-    </div>
-
-    <!-- declacao -->
-    <div id="discipleship-container" class="hidden">
-        <div class="flex flex-col md:flex-row min-h-screen bg-gray-100">
-            
-            <aside class="w-full md:w-80 bg-white shadow-lg p-6 flex-shrink-0">
-                <div class="flex items-center justify-between gap-3 mb-6">
-                     <h1 class="text-xl font-bold text-gray-800">Declaração de Fé</h1>
-                     <button id="back-to-main-site-btn" class="text-sm text-red-600 hover:underline">Voltar ao Site</button>
-                </div>
-                <nav id="lesson-menu" class="space-y-2 custom-scrollbar overflow-y-auto" style="max-height: calc(100vh - 120px);"></nav>
-            </aside>
-
- 
-            <main class="flex-1 p-4 sm:p-6 md:p-10">
-                <div id="content-area" class="bg-white rounded-2xl shadow-md p-6 sm:p-8 w-full max-w-4xl mx-auto min-h-[80vh] flex flex-col"></div>
-                
-                <div id="navigation-buttons" class="flex justify-between items-center mt-8 max-w-4xl mx-auto">
-                    <button id="prev-btn" class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
-                        <i class="fas fa-arrow-left"></i> Anterior
-                    </button>
-                    <span id="progress-indicator" class="text-sm font-medium text-gray-600"></span>
-                    <button id="next-btn" class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
-                        Próxima <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </main>
+        <div class="flex gap-3">
+          <button id="adminLoginBtn" class="flex-1 bg-blue-600 text-white p-2 rounded font-semibold">Entrar</button>
+          <button id="adminCloseBtn" class="flex-1 bg-gray-100 p-2 rounded">Fechar</button>
         </div>
+      </div>
+    </div>
+
+    <!-- ADMIN BADGE + LOGOUT -->
+    <div id="adminBadge" class="admin-badge flex items-center gap-3" style="display: none;">
+      <span>ADMIN</span>
+      <button id="btnAdminLogout" class="bg-red-600 text-white px-2 py-1 rounded text-sm">Logout</button>
+    </div>
+    <div id="loginFloatBtnContainer" class="admin-badge flex items-center gap-3"
+      style="right: 1rem; bottom: 1rem; display: none;">
+      <button id="showLoginModalBtnFloat" class="bg-blue-600 text-white px-3 py-2 rounded-full font-semibold">
+        <i class="fas fa-sign-in-alt mr-2"></i>Login
+      </button>
     </div>
 
 
+    <!-- Header -->
+    <header class="bg-white sticky top-0 z-50 shadow-sm">
+      <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+        <a href="#" class="flex items-center gap-3"><img src="logo.png" alt="logo" class="h-12"><span
+            class="font-bold text-lg">IEQ Olaria II</span></a>
+        <div class="hidden md:flex items-center gap-6">
+          <a href="#sobre" class="text-gray-700 hover:text-red-600">Sobre</a>
+          <a href="#doutrina" class="text-gray-700 hover:text-red-600">Doutrina</a>
+          <a href="#horarios" class="text-gray-700 hover:text-red-600">Programação</a>
+          <a href="#declaracao"
+            class="text-gray-700 hover:text-red-600 font-medium transition-colors text-lg">Declaração
+            de Fé</a>
+          <a href="#galeria" class="text-gray-700 hover:text-red-600">Galeria</a>
+          <a id="navMembros" href="#membros" class="text-gray-700 hover:text-red-600 hidden">Membros</a>
+          <a href="#contato" class="text-gray-700 hover:text-red-600">Contato</a>
+          <a href="https://www.instagram.com/ieqolaria2/" target="_blank"
+            class="bg-gradient-to-r from-pink-500 to-orange-400 text-white px-3 py-2 rounded-full"><i
+              class="fab fa-instagram mr-2"></i>@ieqolaria2</a>
+        </div>
+        <div class="md:hidden">
+          <button id="mobileMenuBtn" class="text-gray-700"><i class="fas fa-bars fa-2x"></i></button>
+        </div>
+
+      </nav>
+      <div id="mobileMenu" class="hidden md:hidden bg-white border-t">
+        <a href="#sobre" class="block px-6 py-3">Sobre</a>
+        <a href="#doutrina" class="block px-6 py-3">Doutrina</a>
+        <a href="#horarios" class="block px-6 py-3">Programação</a>
+        <a href="#declaracao" class="block px-6 py-4 text-gray-700 hover:bg-gray-100 font-medium">Declaração de Fé</a>
+        <a href="#galeria" class="block px-6 py-3">Galeria</a>
+        <a id="mobileNavMembros" href="#membros" class="block px-6 py-3 hidden">Membros</a>
+        <a href="#contato" class="block px-6 py-3">Contato</a>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero py-24 text-center">
+      <div class="container mx-auto px-6">
+        <h1 class="text-5xl md:text-6xl font-extrabold text-gray-900 mb-4">Bem-vindo à IEQ Olaria II</h1>
+        <p class="text-lg md:text-xl text-gray-800">Venha nos visitar e fazer parte da nossa família.</p>
+      </div>
+    </section>
+
+    <main class="container mx-auto px-6 pb-12">
+
+      <!-- Sobre -->
+      <section id="sobre" class="py-16">
+        <div class="container mx-auto px-6">
+          <h2 class="text-2xl font-bold mb-2">Sobre Nossa Igreja</h2>
+          <p class="section-subtitle">Conheça um pouco da nossa história e da nossa missão.</p>
+          <div class="grid md:grid-cols-2 gap-10 items-center">
+            <img src="logo.png" alt="Comunidade" class="rounded-2xl shadow-2xl w-full object-cover">
+            <div class="text-lg text-gray-700 space-y-4">
+              <p>A Igreja do Evangelho do Evangelho Quadrangular, sede de Timóteo, é uma igreja cheia de vida e
+                acolhedora, dedicada a comunicar o evangelho de Jesus Cristo...</p>
+              <p>Liderados pelos nossos pastores Deywson e Sônia Andrade, buscamos ser um farol de esperança...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Doutrina (resumido) -->
+      <section id="doutrina" class="py-8 bg-white rounded-lg p-6 shadow-sm">
+        <h2 class="text-2xl font-bold text-center mb-2">Doutrina Quadrangular</h2>
+        <p class="section-subtitle text-center">Nossa fé é fundamentada em quatro pilares essenciais.</p>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div class="p-6 bg-white rounded-2xl shadow-lg text-center">
+            <i class="fas fa-cross text-4xl mb-4 text-red-600"></i>
+            <h3 class="font-bold text-xl mb-2">Jesus Salva</h3>
+            <p class="text-gray-600">Cremos que Jesus Cristo morreu na cruz para nos salvar...</p>
+          </div>
+          <div class="p-6 bg-white rounded-2xl shadow-lg text-center">
+            <i class="fas fa-dove text-4xl mb-4 text-yellow-500"></i>
+            <h3 class="font-bold text-xl mb-2">Jesus Batiza</h3>
+            <p class="text-gray-600">Cremos no batismo com o Espírito Santo...</p>
+          </div>
+          <div class="p-6 bg-white rounded-2xl shadow-lg text-center">
+            <i class="fas fa-solid fa-trophy text-4xl mb-4 text-blue-400"></i>
+            <h3 class="font-bold text-xl mb-2">Jesus Cura</h3>
+            <p class="text-gray-600">Cremos que Jesus tem o poder de curar...</p>
+          </div>
+          <div class="p-6 bg-white rounded-2xl shadow-lg text-center">
+            <i class="fas fa-crown text-4xl mb-4 text-indigo-600"></i>
+            <h3 class="font-bold text-xl mb-2">Jesus Voltará</h3>
+            <p class="text-gray-600">Cremos na segunda vinda de Jesus...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Programação da semana (visível para todos), mas CRUD apenas admin -->
+      <section id="horarios" class="py-8 mt-6">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h2 class="text-2xl font-bold">Programação da Semana</h2>
+            <p class="text-sm text-gray-600">Veja os eventos semanais</p>
+          </div>
+          <div id="programAdminControls" class="hidden">
+            <button id="btnCreateProgram" class="bg-green-600 text-white px-3 py-2 rounded mr-2">Criar Evento</button>
+          </div>
+        </div>
+
+        <div id="programList" class="grid md:grid-cols-2 gap-4"></div>
+      </section>
+
+      <!-- Declaração da Fé  -->
+      <section id="declaracao" class="py-24 md:py-32 section-bg-alt reveal">
+        <div class="container mx-auto px-6 text-center">
+          <h2 class="section-title">Declaração de Fé</h2>
+          <p class="section-subtitle">Conheça a nossa declaração de fé e se torne um membro.</p>
+          <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl p-8 text-left mt-10">
+            <h3 class="text-3xl font-bold text-gray-800 mb-4">Declaração de fé - Quadrangular</h3>
+            <img src="declaracao.png" alt="Banner do curso de discipulado" class="w-full h-auto rounded-xl mb-6">
+            <p class="text-lg text-gray-700 mb-6">Uma apostila fundamental para todos que desejam firmar os primeiros
+              passos na fé e se tornar um membro. Explore as doutrinas essenciais da vida cristã de forma clara e
+              prática.
+            </p>
+            <button id="start-discipleship-btn"
+              class="w-full bg-blue-600 text-white px-8 py-4 rounded-xl text-xl font-bold hover:bg-blue-700 hover:scale-105 shadow-lg">
+              Acessar declaração de fé
+            </button>
+          </div>
+        </div>
+      </section>
+
+
+      <section id="galeria" class="py-8 bg-white rounded-lg p-6 shadow-sm mt-6">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h2 class="text-2xl font-bold">Mural de Fotos</h2>
+            <p class="text-sm text-gray-600">Registros da Igreja</p>
+          </div>
+          <div id="albumsAdminControls" class="hidden">
+            <button id="btnCreatePhoto" class="bg-green-600 text-white px-3 py-2 rounded mr-2">Adicionar Foto</button>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div id="masonry" class="masonry"></div>
+      </section>
+
+
+
+      <!-- Membros (admin only) -->
+      <section id="membros" class="py-8 mt-6 hidden">
+        <h2 class="text-2xl font-bold mb-2">Gerenciar Membros</h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="bg-white p-4 rounded shadow">
+            <h3 class="font-semibold mb-2">Importar membros (.xlsx)</h3>
+            <input id="xlsxInput" type="file" accept=".xlsx,.xls" class="mb-2" />
+            <button id="importXlsxBtn" class="bg-amber-600 text-white px-3 py-2 rounded mr-2">Importar Excel</button>
+            <button id="exportCsvBtn" class="bg-gray-100 px-3 py-2 rounded">Exportar CSV</button>
+            <button id="clearMembersBtn" class="bg-red-100 text-red-700 px-3 py-2 rounded ml-2">Limpar (local)</button>
+            <p class="text-xs text-gray-500 mt-2">Planilha: Nome, Email, CPF, Telefone, Endereco, DataNascimento</p>
+          </div>
+
+          <form id="memberForm" class="bg-white p-4 rounded shadow space-y-2">
+            <h3 class="font-semibold">Adicionar membro</h3>
+            <input id="mName" placeholder="Nome completo" class="w-full p-2 border rounded" required />
+            <input id="mEmail" type="email" placeholder="E-mail" class="w-full p-2 border rounded" required />
+            <input id="mCPF" placeholder="CPF" class="w-full p-2 border rounded" required />
+            <input id="mPhone" placeholder="Telefone" class="w-full p-2 border rounded" required />
+            <input id="mAddress" placeholder="Endereço" class="w-full p-2 border rounded" required />
+            <input id="mBirth" type="date" class="w-full p-2 border rounded" required />
+            <div class="flex gap-2">
+              <button type="submit" class="bg-blue-600 text-white px-3 py-2 rounded">Salvar</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="mt-4 bg-white p-4 rounded shadow">
+          <h3 class="font-semibold mb-2">Lista de membros</h3>
+          <div id="membersList" class="max-h-64 overflow-auto space-y-2"></div>
+        </div>
+      </section>
+
+
+
+      <!-- Aniversariantes -->
+      <section id="aniversariantes" class="py-8 mt-6 bg-white p-6 rounded shadow">
+        <h2 class="text-2xl font-bold mb-2">Aniversariantes do mês</h2>
+        <div id="birthdayList" class="space-y-2"></div>
+      </section>
+
+      <!-- Contato -->
+      <section id="contato" class="py-16">
+        <div class="container mx-auto px-6">
+          <h2 class="text-2xl font-bold mb-2">Visite-nos</h2>
+          <p class="section-subtitle">Será uma alegria receber você e sua família.</p>
+          <div class="grid md:grid-cols-2 gap-6 items-center">
+            <div class="h-80 rounded-2xl overflow-hidden">
+              <iframe
+                src="https://maps.google.com/maps?q=Rua%2059%2C%2045%20Olaria%202%2C%20Tim%C3%B3teo%20MG&t=&z=17&ie=UTF8&iwloc=&output=embed"
+                width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+            <div>
+              <div class="bg-white p-6 rounded-2xl shadow-xl">
+                <h3 class="font-bold text-2xl mb-2">IEQ Olaria II</h3>
+                <p class="text-gray-600 mb-2"><i class="fas fa-map-marker-alt mr-2 text-blue-600"></i>Rua 59, nº 45 -
+                  Olaria 2, Timóteo - MG</p>
+                <p class="text-gray-600 mb-2"><i class="fas fa-phone mr-2 text-blue-600"></i>(31) 3848-2880</p>
+                <a href="https://www.instagram.com/ieqolaria2/" target="_blank"
+                  class="text-pink-600 font-semibold">@ieqolaria2</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </section>
+
+    </main>
+
+    <!-- Modals root -->
+    <div id="modalRoot" class="hidden"></div>
+
+    <!-- Admin badge visible -->
+    <div id="adminBadgeFloat" class="admin-badge">ADMIN</div>
+
+    <!-- Scripts -->
     <script>
-       
-        const mainSiteContainer = document.getElementById('main-site');
-        const discipleshipContainer = document.getElementById('discipleship-container');
-        const startDiscipleshipBtn = document.getElementById('start-discipleship-btn');
-        const backToMainSiteBtn = document.getElementById('back-to-main-site-btn');
+      /*************************************************************************
+       * Config
+       **************************************************************************/
+      const API_BASE_URL = 'http://localhost:8080';
+      const STORAGE_ALBUMS = 'ieq_albums';
+      const STORAGE_MEMBERS = 'ieq_members';
+      const STORAGE_PROGRAM = 'ieq_program';
 
-        
-        startDiscipleshipBtn.addEventListener('click', () => {
-            mainSiteContainer.classList.add('hidden');
-            discipleshipContainer.classList.remove('hidden');
-            window.scrollTo(0, 0); 
-        });
+      /*************************************************************************
+       * Helpers
+       **************************************************************************/
+      function readJSON(key) { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { return []; } }
+      function writeJSON(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+      function formatBR(iso) { if (!iso) return ''; const d = new Date(iso); if (isNaN(d)) return iso; return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
 
-        backToMainSiteBtn.addEventListener('click', () => {
-            discipleshipContainer.classList.add('hidden');
-            mainSiteContainer.classList.remove('hidden');
-            window.scrollTo(0, 0); 
-        });
+      /*************************************************************************
+       * Admin UI handling (login, logout)
+       **************************************************************************/
+      const loginModal = document.getElementById('loginModal');
+      const adminPasswordInput = document.getElementById('adminPasswordInput');
+      const adminLoginBtn = document.getElementById('adminLoginBtn');
+      const adminCloseBtn = document.getElementById('adminCloseBtn');
+      const adminBadge = document.getElementById('adminBadge');
+      const navMembros = document.getElementById('navMembros');
+      const mobileNavMembros = document.getElementById('mobileNavMembros');
+      const albumsAdminControls = document.getElementById('albumsAdminControls');
+      const membersSection = document.getElementById('membros');
+      const programAdminControls = document.getElementById('programAdminControls');
+      const loginFloatBtnContainer = document.getElementById('loginFloatBtnContainer');
+      const showLoginModalBtnFloat = document.getElementById('showLoginModalBtnFloat');
 
+      let isAdmin = false;
+      let authToken = null; // Armazenar o token JWT
 
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
-        for (let link of mobileMenuLinks) {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.add('hidden');
-            });
+      adminBadge.style.display = 'none';
+      function setAdminMode(on) {
+        isAdmin = !!on;
+
+        if (adminBadge) {
+          adminBadge.style.display = isAdmin ? 'flex' : 'none';
         }
 
-      
-        function reveal() {
-            var reveals = document.querySelectorAll(".reveal");
-            for (var i = 0; i < reveals.length; i++) {
-                var windowHeight = window.innerHeight;
-                var elementTop = reveals[i].getBoundingClientRect().top;
-                var elementVisible = 150;
-                if (elementTop < windowHeight - elementVisible) {
-                    reveals[i].classList.add("active");
-                } else {
-                    reveals[i].classList.remove("active");
-                }
+        if (loginFloatBtnContainer) {
+          loginFloatBtnContainer.style.display = isAdmin ? 'none' : 'flex';
+        }
+        // --- Lógica de Status de Login/Logout ---
+
+        if (isAdmin) {
+          // MODO ADMIN ATIVADO: Mostra a badge flutuante (ADMIN/Logout) e esconde o botão Login
+          adminBadge.style.display = 'flex';
+          loginFloatBtnContainer.style.display = 'none'; // Esconde o botão Login flutuante
+        } else {
+          // MODO PÚBLICO: Esconde a badge flutuante e mostra o botão Login flutuante
+          adminBadge.style.display = 'none';
+          loginFloatBtnContainer.style.display = 'flex'; // Mostra o botão Login flutuante
+        }
+
+        // --- Lógica de Elementos do Painel Admin (Toggles) ---
+        // Faz o toggle de todos os painéis e links que só o Admin deve ver
+        document.getElementById('albumsAdminControls')?.classList.toggle('hidden', !isAdmin);
+        document.getElementById('navMembros')?.classList.toggle('hidden', !isAdmin);
+        document.getElementById('mobileNavMembros')?.classList.toggle('hidden', !isAdmin);
+        document.getElementById('membros')?.classList.toggle('hidden', !isAdmin);
+        document.getElementById('programAdminControls')?.classList.toggle('hidden', !isAdmin);
+
+        // Se o modo admin foi ativado, garantimos que a seção membros é carregada
+        if (isAdmin) {
+          renderAll();
+        }
+      }
+      window.addEventListener('load', () => {
+        setAdminMode(false); renderAll();
+        // Vincular o clique do botão flutuante para abrir o modal
+        showLoginModalBtnFloat.addEventListener('click', () => {
+          // Abre o modal de login que já existe
+          loginModal.classList.remove('hidden');
+        });
+      });
+
+      adminLoginBtn.addEventListener('click', async () => {
+        const cpf = adminCpfInput.value || ''; // <-- COLETANDO O CPF DO INPUT
+        const pw = adminPasswordInput.value || ''; // COLETANDO A SENHA
+
+        // Verifica se os campos foram preenchidos
+        if (!cpf || !pw) {
+          alert('Por favor, insira CPF e senha.');
+          return;
+        }
+        // 1. Chamar o endpoint de login da sua API (Exemplo: /login ou /auth)
+        //    Esta rota PRECISA ser criada na sua API para autenticação e retorno do token JWT.
+        try {
+          const response = await fetch(`${API_BASE_URL}/auth/login`, { // << Altere para sua rota de login
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cpf: cpf, senha: pw })
+          });
+
+          if (!response.ok) throw new Error('Falha na autenticação');
+
+          const data = await response.json();
+          authToken = data.accessToken; // Supondo que a API retorna { token: "..." }
+
+          setAdminMode(true);
+          loginModal.classList.add('hidden');
+          renderAll();
+          alert('Modo admin ativado.');
+
+        } catch (error) {
+          alert('Falha na autenticação: ' + error.message);
+        }
+      });
+
+      document.getElementById('btnAdminLogout')?.addEventListener('click', () => {
+        setAdminMode(false);
+        authToken = null; // Limpa o token
+        alert('Logout do admin realizado.');
+        location.reload();
+      });
+
+
+
+      // Helper para incluir o token em requisições protegidas
+      function getAuthHeaders() {
+        // 🚨 VERIFICAÇÃO: Se authToken é 'undefined', o header será 'Bearer undefined'
+        if (!authToken) {
+          console.warn("Tentativa de acesso protegido sem token.");
+          return { 'Content-Type': 'application/json' }; // Retorna sem Authorization
+        }
+
+        return {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}` // Use o valor armazenado
+        };
+      }
+      adminCloseBtn.addEventListener('click', () => loginModal.classList.add('hidden'));
+
+      // mobile menu toggle
+      document.getElementById('mobileMenuBtn').addEventListener('click', () => document.getElementById('mobileMenu').classList.toggle('hidden'));
+
+      /*************************************************************************
+       * Modal helpers
+       **************************************************************************/
+      const modalRoot = document.getElementById('modalRoot');
+      function showModal(innerHTML) {
+        modalRoot.innerHTML = `<div class="modal-backdrop" id="modalBackdrop"><div class="modal-content relative">${innerHTML}<button id="modalClose" class="absolute top-3 right-3 text-gray-600"><i class="fas fa-times fa-lg"></i></button></div></div>`;
+        modalRoot.classList.remove('hidden');
+        document.getElementById('modalClose').addEventListener('click', hideModal);
+        document.getElementById('modalBackdrop').addEventListener('click', (e) => { if (e.target.id === 'modalBackdrop') hideModal(); });
+      }
+      function hideModal() { modalRoot.innerHTML = ''; modalRoot.classList.add('hidden'); }
+
+      /*************************************************************************
+       * ALBUMS CRUD
+       **************************************************************************/
+      const albumListEl = document.getElementById('albumList');
+      const masonryEl = document.getElementById('masonry');
+      const btnCreatePhoto = document.getElementById('btnCreatePhoto');
+
+
+
+      // NOVO: Função para carregar todas as imagens
+      async function loadAllImagesFromAPI() {
+        try {
+          const response = await fetch(`${API_BASE_URL}/imagens`);
+          if (!response.ok) throw new Error('Falha ao carregar imagens.');
+          const images = await response.json();
+          return Array.isArray(images) ? images : [];
+        } catch (e) {
+          console.error('Erro ao carregar mural:', e);
+          return [];
+        }
+      }
+
+      // NOVO: Função para renderizar o Mural de Fotos
+      async function renderPhotos() {
+        const images = await loadAllImagesFromAPI();
+
+        // O elemento de listagem de álbuns já foi removido, só precisamos do masonry
+        masonryEl.innerHTML = '';
+
+        if (!images.length) {
+          masonryEl.innerHTML = '<div class="p-4 text-gray-600">Nenhuma foto no mural.</div>';
+          return;
+        }
+
+        images.forEach(p => {
+          // Usa as novas propriedades: p.titulo e p.descricao
+          const photoHtml = `
+            <div class="masonry-item">
+                <img src="${p.url}" alt="${p.titulo || p.nomeArquivo}">
+                <div class="meta p-3 text-sm text-gray-700">
+                    <h4 class="font-bold text-lg">${p.titulo || 'Sem Título'}</h4>
+                    <p>${p.descricao || p.nomeArquivo}</p>
+                    ${isAdmin ? `<div class='mt-2'><button data-id='${p.id}' class='deletePhotoBtn text-red-600 text-sm'>Excluir foto</button></div>` : ''}
+                </div>
+            </div>
+        `;
+          masonryEl.innerHTML += photoHtml;
+        });
+
+        // Bind do botão de exclusão
+        document.querySelectorAll('.deletePhotoBtn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const photoId = parseInt(e.target.dataset.id, 10);
+            if (!confirm('Excluir foto do mural?')) return;
+
+            // Assume que deleteImageFromAPI(id) está definido e funciona
+            const success = await deleteImageFromAPI(photoId);
+            if (success) {
+              renderPhotos(); // Recarrega o mural
             }
-        }
-        window.addEventListener("scroll", reveal);
-        reveal(); 
+          });
+        });
+      }
+      btnCreatePhoto?.addEventListener('click', () => {
+        if (!isAdmin) { alert('Somente admin'); return; }
+        showModal(`<div class="p-4">
+      <h3 class="text-xl font-bold mb-2">Adicionar Foto ao Mural</h3>
+      <input id="photosTitle" placeholder="Título (para exibir no mural)" class="w-full p-2 border rounded mb-2"/>
+      <textarea id="photosDescription" placeholder="Descrição (para exibir no mural)" class="w-full p-2 border rounded mb-2"></textarea>
+      <input id="photosFiles" type="file" accept="image/*" class="w-full mb-3"/>
+      <div class="flex gap-2"><button id="sendPhotosBtn" class="bg-green-600 text-white px-3 py-2 rounded">Enviar</button><button id="cancelPhotos" class="bg-gray-100 px-3 py-2 rounded">Cancelar</button></div>
+    </div>`);
 
-        const lessons = [
-            {
-                title: "Carta de Boas-Vindas",
-                content: `
+        document.getElementById('cancelPhotos').addEventListener('click', hideModal);
+        document.getElementById('sendPhotosBtn').addEventListener('click', async () => {
+          const filesEl = document.getElementById('photosFiles');
+          const title = document.getElementById('photosTitle').value.trim();
+          const description = document.getElementById('photosDescription').value.trim();
+
+          if (!filesEl.files || filesEl.files.length === 0) { alert('Selecione uma imagem'); return; }
+
+          const file = filesEl.files[0]; // Permite apenas 1 upload por vez no frontend simplificado
+          const result = await uploadPhotoToAPI(file, title, description);
+
+          hideModal();
+          if (result) {
+            renderPhotos(); // Recarrega o mural
+            alert(`Foto "${title}" enviada com sucesso.`);
+          }
+        });
+      });
+      async function deleteImageFromAPI(id) {
+        if (!isAdmin) {
+          alert('Ação somente para Admin.');
+          return false;
+        }
+
+        // O endpoint DEVE ser ajustado para o novo padrão: DELETE /imagens/{id}
+        try {
+          const response = await fetch(`${API_BASE_URL}/imagens/${id}`, {
+            method: 'DELETE',
+            // Reutiliza o helper que inclui o token JWT
+            headers: getAuthHeaders()
+          });
+
+          if (!response.ok) {
+            // Tenta obter o corpo da resposta em caso de erro para debug
+            const errorText = await response.text();
+            throw new Error(errorText || `Falha ao excluir a imagem (Status: ${response.status})`);
+          }
+
+          // Retorna true para indicar sucesso (204 No Content)
+          alert('Foto excluída da API e do S3.');
+          return true;
+
+        } catch (e) {
+          console.error('Erro ao deletar imagem:', e);
+          alert('Erro ao excluir foto: ' + e.message);
+          return false;
+        }
+      }
+
+      // NOVO: Função de Upload Simples para a API (com Título e Descrição)
+      async function uploadPhotoToAPI(file, title, description, tipo = 'MURAL') {
+        if (!isAdmin) return null;
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('tipo', tipo); // Usamos 'MURAL' como tipo padrão
+        formData.append('titulo', title);
+        formData.append('descricao', description);
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/imagens/upload`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${authToken}`
+            },
+            body: formData
+          });
+          // 1. Apenas verifica o sucesso (Status 201 Created)
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Falha no upload (${response.status}): ${errorText}`);
+          }
+
+          // 2. RETORNA TRUE EM VEZ DE TENTAR LER JSON
+          return true;
+        } catch (e) {
+          alert('Erro ao enviar foto: ' + e.message);
+          return null;
+        }
+      }
+
+      /*************************************************************************
+       * PROGRAM (CRUD) - option B: day, time, description
+       **************************************************************************/
+      const programListEl = document.getElementById('programList');
+      const btnCreateProgram = document.getElementById('btnCreateProgram');
+
+      // NOVO: Função para buscar eventos da API (GET /eventos é permitAll())
+      async function loadProgramFromAPI() {
+        try {
+          const response = await fetch(`${API_BASE_URL}/eventos`);
+          if (!response.ok) throw new Error('Falha ao carregar eventos.');
+
+          // Retorna a lista de EventoDTOs (que inclui id, dia, hora, titulo, descricao)
+          const list = await response.json();
+          return Array.isArray(list) ? list : [];
+        } catch (e) {
+          console.error('Erro ao carregar programação:', e);
+          return [];
+        }
+      }
+
+      // NOVO: Função para enviar/atualizar evento para a API
+      async function saveProgramToAPI(eventData, method = 'POST', id = null) {
+        if (!isAdmin) {
+          alert('Ação restrita ao Administrador.');
+          return null;
+        }
+
+        let url = `${API_BASE_URL}/eventos`;
+        if (id && method === 'PUT') url = `${API_BASE_URL}/eventos/${id}`;
+
+        try {
+          const response = await fetch(url, {
+            method: method,
+            headers: getAuthHeaders(), // Requer token ADMIN
+            body: JSON.stringify(eventData)
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Falha ao salvar evento.');
+          }
+
+          return await response.json();
+        } catch (e) {
+          alert('Erro ao salvar evento: ' + e.message.substring(0, 100));
+          return null;
+        }
+      }
+
+      // NOVO: Função para deletar evento
+      async function deleteProgramFromAPI(id) {
+        if (!isAdmin) return alert('Ação somente para Admin.');
+        try {
+          const response = await fetch(`${API_BASE_URL}/eventos/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders() // Requer token ADMIN
+          });
+          if (!response.ok) throw new Error('Falha ao excluir evento.');
+          return true;
+        } catch (e) {
+          alert('Erro ao excluir evento: ' + e.message.substring(0, 100));
+          return false;
+        }
+      }
+
+      async function renderProgram() {
+        // 1. Carrega dados da API
+        const list = await loadProgramFromAPI();
+
+        programListEl.innerHTML = '';
+
+        if (!list.length) {
+          programListEl.innerHTML = '<div class="p-4 text-gray-600">Nenhum evento na programação.</div>';
+          return;
+        }
+
+        // 2. Ordena por dia da semana e hora (Lógica simplificada - a API deve fazer isso idealmente)
+        const daysOrder = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        list.sort((a, b) => {
+          const dayDiff = daysOrder.indexOf(a.dia) - daysOrder.indexOf(b.dia);
+          if (dayDiff !== 0) return dayDiff;
+          // Compara hora como string (LocalTime)
+          return a.hora.localeCompare(b.hora);
+        });
+
+        list.forEach((ev) => {
+          const card = document.createElement('div');
+          card.className = 'bg-white p-4 rounded shadow';
+
+          // 3. Usa as propriedades em camelCase da API (titulo, hora, dia, id)
+          card.innerHTML = `
+            <div class="flex justify-between items-start">
+                <div>
+                    <div class="font-bold">${ev.dia} • ${ev.hora ? ev.hora.substring(0, 5) : 'N/A'}</div>
+                    <div class="text-gray-700 mt-1">${ev.titulo}</div>
+                    <div class="text-sm text-gray-500 mt-1">${ev.descricao || 'Sem descrição'}</div>
+                </div>
+                <div>
+                    ${isAdmin ? `
+                        <button data-id="${ev.id}" class="editProgBtn text-yellow-600 mr-2">Editar</button>
+                        <button data-id="${ev.id}" class="deleteProgBtn text-red-600">Excluir</button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+          programListEl.appendChild(card);
+        });
+
+        // 4. Bind dos botões com o ID real
+        document.querySelectorAll('.editProgBtn').forEach(btn => btn.addEventListener('click', e => {
+          const id = parseInt(e.target.dataset.id, 10);
+          showEditProgramModal(id);
+        }));
+        document.querySelectorAll('.deleteProgBtn').forEach(btn => btn.addEventListener('click', async e => {
+          const id = parseInt(e.target.dataset.id, 10);
+          if (!confirm('Excluir evento?')) return;
+          if (await deleteProgramFromAPI(id)) {
+            renderProgram(); // Recarrega se o delete for sucesso
+          }
+        }));
+      }
+      function loginAdmin() {
+        const senha = document.getElementById("adminPassword").value;
+        if (senha === senhaCorreta) {
+
+          isAdmin = true;
+
+          // Oculta completamente o modal
+          const modal = document.getElementById("loginModal");
+          modal.classList.add("hidden");
+          modal.style.display = "none";
+
+          // Mostra menus do admin
+          //document.getElementById("menuAdminMembros").classList.remove("hidden");
+          //document.getElementById("menuAdminAlbuns").classList.remove("hidden");
+          //document.getElementById("programacaoAdmin").classList.remove("hidden");
+
+        } else {
+          alert("Senha incorreta.");
+        }
+      }
+
+      btnCreateProgram?.addEventListener('click', () => {
+        if (!isAdmin) { alert('Somente admin'); return; }
+        showModal(`<div class="p-4">
+      <h3 class="text-xl font-bold mb-2">Criar Evento</h3>
+      <select id="progDay" class="w-full p-2 border rounded mb-2">
+        <option>Segunda</option><option>Terça</option><option>Quarta</option><option>Quinta</option><option>Sexta</option><option>Sábado</option><option>Domingo</option>
+      </select>
+      <input id="progTime" type="time" class="w-full p-2 border rounded mb-2"/>
+      <input id="progTitle" placeholder="Título" class="w-full p-2 border rounded mb-2"/>
+      <textarea id="progDesc" placeholder="Descrição" class="w-full p-2 border rounded mb-2"></textarea>
+      <div class="flex gap-2"><button id="saveProgBtn" class="bg-green-600 text-white px-3 py-2 rounded">Salvar</button><button id="cancelProg" class="bg-gray-100 px-3 py-2 rounded">Cancelar</button></div>
+    </div>`);
+
+        document.getElementById('saveProgBtn').addEventListener('click', async () => { // Torna async
+          const day = document.getElementById('progDay').value;
+          const time = document.getElementById('progTime').value;
+          const title = document.getElementById('progTitle').value.trim();
+          const description = document.getElementById('progDesc').value.trim();
+          if (!day || !time || !title) { alert('Preencha dia, horário e título'); return; }
+
+          const eventData = {
+            dia: day,
+            hora: time,
+            titulo: title,
+            descricao: description
+          };
+
+          const result = await saveProgramToAPI(eventData, 'POST'); // Chama API
+
+          if (result) {
+            renderProgram();
+            hideModal();
+            alert('Evento criado na API.');
+          }
+        });
+      });
+
+      async function showEditProgramModal(id) { // Torna async e usa ID
+        if (!isAdmin) return;
+
+        // 1. Busca o evento pelo ID (Simulação, pois não temos um endpoint GET by ID simples na API)
+        // Para simplificar, vamos carregar todos e encontrar o evento:
+        const allEvents = await loadProgramFromAPI();
+        const ev = allEvents.find(e => e.id === id);
+
+        if (!ev) { alert('Evento não encontrado!'); return; }
+
+        showModal(`<div class="p-4">
+      <h3 class="text-xl font-bold mb-2">Editar Evento</h3>
+      <select id="editProgDay" class="w-full p-2 border rounded mb-2">
+        <option ${ev.day === 'Segunda' ? 'selected' : ''}>Segunda</option><option ${ev.day === 'Terça' ? 'selected' : ''}>Terça</option><option ${ev.day === 'Quarta' ? 'selected' : ''}>Quarta</option><option ${ev.day === 'Quinta' ? 'selected' : ''}>Quinta</option><option ${ev.day === 'Sexta' ? 'selected' : ''}>Sexta</option><option ${ev.day === 'Sábado' ? 'selected' : ''}>Sábado</option><option ${ev.day === 'Domingo' ? 'selected' : ''}>Domingo</option>
+      </select>
+      <input id="editProgTime" type="time" value="${ev.time || ''}" class="w-full p-2 border rounded mb-2"/>
+      <input id="editProgTitle" value="${(ev.title || '').replace(/"/g, '&quot;')}" class="w-full p-2 border rounded mb-2"/>
+      <textarea id="editProgDesc" class="w-full p-2 border rounded mb-2">${(ev.description || '').replace(/</g, '&lt;')}</textarea>
+      <div class="flex gap-2"><button id="saveEditProg" class="bg-blue-600 text-white px-3 py-2 rounded">Salvar</button><button id="cancelEditProg" class="bg-gray-100 px-3 py-2 rounded">Cancelar</button></div>
+    </div>`);
+
+        document.getElementById('saveEditProg').addEventListener('click', async () => { // Torna async
+          const day = document.getElementById('editProgDay').value;
+          const time = document.getElementById('editProgTime').value;
+          const title = document.getElementById('editProgTitle').value.trim();
+          const description = document.getElementById('editProgDesc').value.trim();
+          if (!day || !time || !title) { alert('Preencha campos'); return; }
+
+          const updatedData = {
+            dia: day,
+            hora: time,
+            titulo: title,
+            descricao: description
+          };
+
+          const result = await saveProgramToAPI(updatedData, 'PUT', id); // Chama API com PUT e ID
+
+          if (result) {
+            renderProgram();
+            hideModal();
+            alert('Evento atualizado na API.');
+          }
+        });
+      }
+
+      function showEditProgramModal(index) {
+
+        document.getElementById('cancelEditProg').addEventListener('click', hideModal);
+        document.getElementById('saveEditProg').addEventListener('click', () => {
+          const day = document.getElementById('editProgDay').value;
+          const time = document.getElementById('editProgTime').value;
+          const title = document.getElementById('editProgTitle').value.trim();
+          const description = document.getElementById('editProgDesc').value.trim();
+          if (!day || !time || !title) { alert('Preencha campos'); return; }
+          arr[index] = { day, time, title, description };
+          saveProgram(arr); renderProgram(); hideModal();
+        });
+      }
+
+      /*************************************************************************
+       * MEMBERS CRUD + Excel import + Export CSV
+       **************************************************************************/
+      const membersListEl = document.getElementById('membersList');
+      const memberForm = document.getElementById('memberForm');
+      const xlsxInput = document.getElementById('xlsxInput');
+      const importXlsxBtn = document.getElementById('importXlsxBtn');
+      const exportCsvBtn = document.getElementById('exportCsvBtn');
+      const clearMembersBtn = document.getElementById('clearMembersBtn');
+
+      async function loadMembers() {
+        try {
+          const response = await fetch(`${API_BASE_URL}/membros`);
+          if (!response.ok) throw new Error('Falha ao carregar membros');
+          const list = await response.json();
+          return list; // Retorna a lista de DTOs de Membro
+        } catch (e) {
+          console.error('Erro ao carregar membros:', e);
+          return [];
+        }
+      }
+      function saveMembers(list) { writeJSON(STORAGE_MEMBERS, list); }
+
+      async function renderMembers() {
+        const list = await loadMembers();
+        membersListEl.innerHTML = '';
+
+        if (!Array.isArray(list) || !list.length) {
+          membersListEl.innerHTML = '<div class="p-3 text-gray-600">Nenhum membro cadastrado.</div>';
+          return;
+        }
+
+        list.forEach((m) => { // Não precisamos mais do índice 'idx'
+          const div = document.createElement('div');
+          div.className = 'p-3 rounded bg-white shadow flex justify-between items-start';
+
+          // Acesso usando Camel Case (m.nome, m.email, m.numero, m.endereco, m.dataNascimento)
+          div.innerHTML = `
+            <div>
+                <strong>${m.nome}</strong>
+                <div class="text-sm text-gray-600">${m.email} • ${m.numero || 'N/A'}</div>
+                <div class="text-sm mt-1 text-gray-700">
+                    ${m.endereco || 'Endereço não informado'} • ${formatBR(m.dataNascimento)}
+                </div>
+            </div>
+            <div>
+                <button data-id="${m.id}" class="editMemberBtn text-yellow-600 mr-2">Editar</button>
+                <button data-id="${m.id}" class="deleteMemberBtn text-red-600">Excluir</button>
+            </div>
+        `;
+          membersListEl.appendChild(div);
+        });
+
+        // ... (lógica de bind dos botões) ...
+        document.querySelectorAll('.deleteMemberBtn').forEach(btn => btn.addEventListener('click', async e => {
+          const memberId = e.target.dataset.id;
+          if (!confirm('Remover membro?')) return;
+          await deleteMember(memberId); // Chama a nova função de DELETE
+          renderMembers(); renderBirthdays();
+        }));
+        document.querySelectorAll('.editMemberBtn').forEach(btn => btn.addEventListener('click', e => {
+          const memberId = e.target.dataset.id;
+          showEditMemberModal(memberId); // Chama o modal com o ID
+        }));
+        renderBirthdays();
+      }
+
+      // add member via form
+      memberForm?.addEventListener('submit', async (ev) => { // TORNE A FUNÇÃO ASYNC
+        ev.preventDefault();
+        if (!isAdmin) return alert('Ação somente para Admin.');
+
+        // Coleta dos dados (permanece igual)
+        const name = document.getElementById('mName').value.trim();
+        const email = document.getElementById('mEmail').value.trim();
+        const cpf = document.getElementById('mCPF').value.trim();
+        const phone = document.getElementById('mPhone').value.trim();
+        const address = document.getElementById('mAddress').value.trim();
+        const birth = document.getElementById('mBirth').value; // Formato YYYY-MM-DD
+        if (!name || !email || !cpf || !phone || !address || !birth) { alert('Preencha todos os campos'); return; }
+
+        // 1. Monta o Payload para a API
+        const memberData = {
+          nome: name,
+          email: email,
+          cpf: cpf,
+          numero: phone, // A sua API espera 'numero', não 'telefone'
+          endereco: address,
+          dataNascimento: birth // Formato correto para LocalDate no Spring
+        };
+
+        // 2. Chama a API
+        try {
+          const response = await fetch(`${API_BASE_URL}/membros`, {
+            method: 'POST',
+            headers: getAuthHeaders(), // CHAMADA CORRETA
+            body: JSON.stringify(memberData)
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Falha ao salvar membro.');
+          }
+
+          memberForm.reset();
+          await renderMembers(); // Recarrega a lista
+          alert('Membro salvo na API.');
+        } catch (e) {
+          console.error('Erro ao salvar:', e);
+          alert('Erro ao salvar membro: ' + e.message);
+        }
+      });
+
+      // edit member modal
+      function showEditMemberModal(index) {
+        const arr = loadMembers(); const m = arr[index];
+        showModal(`<div class="p-4">
+      <h3 class="text-xl font-bold mb-2">Editar Membro</h3>
+      <input id="editMName" class="w-full p-2 border rounded mb-2" value="${(m.Nome || '').replace(/"/g, '&quot;')}"/>
+      <input id="editMEmail" class="w-full p-2 border rounded mb-2" value="${(m.Email || '').replace(/"/g, '&quot;')}"/>
+      <input id="editMCPF" class="w-full p-2 border rounded mb-2" value="${(m.CPF || '').replace(/"/g, '&quot;')}"/>
+      <input id="editMPhone" class="w-full p-2 border rounded mb-2" value="${(m.Telefone || '').replace(/"/g, '&quot;')}"/>
+      <input id="editMAddress" class="w-full p-2 border rounded mb-2" value="${(m.Endereco || '').replace(/"/g, '&quot;')}"/>
+      <input id="editMBirth" type="date" class="w-full p-2 border rounded mb-2" value="${(m.DataNascimento || '').split('T')[0] || ''}"/>
+      <div class="flex gap-2"><button id="saveEditMember" class="bg-blue-600 text-white px-3 py-2 rounded">Salvar</button><button id="cancelEditMember" class="bg-gray-100 px-3 py-2 rounded">Cancelar</button></div>
+    </div>`);
+        document.getElementById('cancelEditMember').addEventListener('click', hideModal);
+        document.getElementById('saveEditMember').addEventListener('click', () => {
+          const name = document.getElementById('editMName').value.trim();
+          const email = document.getElementById('editMEmail').value.trim();
+          const cpf = document.getElementById('editMCPF').value.trim();
+          const phone = document.getElementById('editMPhone').value.trim();
+          const address = document.getElementById('editMAddress').value.trim();
+          const birth = document.getElementById('editMBirth').value;
+          if (!name || !email || !cpf || !phone || !address || !birth) { alert('Preencha todos os campos'); return; }
+          arr[index] = { Nome: name, Email: email, CPF: cpf, Telefone: phone, Endereco: address, DataNascimento: birth };
+          saveMembers(arr); hideModal(); renderMembers(); renderBirthdays();
+        });
+      }
+
+      // Função para enviar um membro individualmente para a API
+      async function postMemberToAPI(memberData) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/membros`, {
+            method: 'POST',
+            headers: getAuthHeaders(), // Requer token ADMIN
+            body: JSON.stringify(memberData)
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Erro ao inserir membro na API:', errorText);
+            return { success: false, error: errorText };
+          }
+
+          return { success: true };
+        } catch (e) {
+          console.error('Falha de rede ao inserir membro:', e);
+          return { success: false, error: e.message };
+        }
+      }
+
+      // NOVO EVENT LISTENER PARA IMPORTAÇÃO DE EXCEL
+      importXlsxBtn?.addEventListener('click', () => {
+        if (!isAdmin) {
+          alert('Ação restrita ao Administrador.');
+          return;
+        }
+        const file = xlsxInput.files && xlsxInput.files[0];
+        if (!file) { alert('Selecione um arquivo .xlsx'); return; }
+
+        // Desabilita o botão para evitar cliques múltiplos
+        importXlsxBtn.disabled = true;
+
+        const fr = new FileReader();
+        fr.onload = async function (e) { // Torna a função de onload assíncrona
+          let successCount = 0;
+          let failCount = 0;
+
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+            if (!rows.length) {
+              alert('Planilha vazia');
+              return;
+            }
+
+            // Mapeamento e adaptação dos nomes das colunas da planilha para o JSON da API
+            const membersToUpload = rows.map(r => ({
+              // API espera: nome, email, cpf, numero, endereco, dataNascimento
+              nome: r.Nome || r.nome || r.Name || r.name || '',
+              email: r.Email || r.email || '',
+              cpf: r.CPF || r.cpf || '',
+              numero: r.Telefone || r.telefone || r.Phone || r.phone || '', // Mapeado para 'numero'
+              endereco: r.Endereco || r.endereco || r.Address || r.address || '',
+              dataNascimento: r.DataNascimento || r.dataNascimento || r.data || r.DataNascimento || '' // Formato YYYY-MM-DD
+            }));
+
+            // 📢 Itera e envia cada membro para a API
+            for (const member of membersToUpload) {
+              // Remove membros incompletos (opcional, mas bom)
+              if (!member.nome || !member.cpf) {
+                failCount++;
+                continue;
+              }
+
+              const result = await postMemberToAPI(member);
+              if (result.success) {
+                successCount++;
+              } else {
+                failCount++;
+                console.error(`Falha ao inserir CPF ${member.cpf}: ${result.error}`);
+              }
+            }
+
+            // Após completar todos os uploads
+            await renderMembers(); // Recarrega a lista
+            alert(`Importação concluída: ${successCount} membros inseridos. ${failCount} falhas.`);
+
+          } catch (error) {
+            alert(`Erro fatal durante o processamento da planilha: ${error.message}`);
+            console.error(error);
+          } finally {
+            importXlsxBtn.disabled = false; // Reabilita o botão
+          }
+        };
+        fr.readAsArrayBuffer(file);
+      });
+
+      // export CSV
+      exportCsvBtn?.addEventListener('click', () => {
+        const members = loadMembers(); if (!members.length) { alert('Nenhum membro'); return; }
+        const header = ['Nome', 'Email', 'CPF', 'Telefone', 'Endereco', 'DataNascimento'];
+        const rows = members.map(m => [m.Nome || '', m.Email || '', m.CPF || '', m.Telefone || '', m.Endereco || '', m.DataNascimento || '']);
+        const csv = [header, ...rows].map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'membros.csv'; a.click(); URL.revokeObjectURL(url);
+      });
+
+      async function deleteMember(id) {
+        if (!isAdmin) return alert('Ação somente para Admin.');
+        try {
+          const response = await fetch(`${API_BASE_URL}/membros/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders() // Requer token ADMIN
+          });
+          if (!response.ok) throw new Error('Falha ao excluir.');
+          alert('Membro excluído.');
+        } catch (e) {
+          console.error('Erro ao deletar membro:', e);
+          alert('Erro ao excluir membro: ' + e.message);
+        }
+      }
+
+      // clear members
+      clearMembersBtn?.addEventListener('click', () => {
+        if (!confirm('Apagar TODOS os membros (localStorage)?')) return;
+        localStorage.removeItem(STORAGE_MEMBERS); renderMembers(); renderBirthdays();
+      });
+
+      /*************************************************************************
+       * Birthdays (visible to all)
+       **************************************************************************/
+      const birthdayListEl = document.getElementById('birthdayList');
+      async function renderBirthdays() {
+        // 1. Usa 'await' para obter o array de membros
+        const members = await loadMembers();
+
+        // Verificação de segurança: garante que é um array antes de filtrar
+        if (!Array.isArray(members)) {
+          console.error("Erro: loadMembers() não retornou um array.");
+          birthdayListEl.innerHTML = '<p class="text-red-500">Erro ao carregar lista de membros.</p>';
+          return;
+        }
+
+        // O mês atual (0=Jan, 11=Dez)
+        const currentMonth = new Date().getMonth();
+
+        const birthdays = members.filter(m => {
+          // 2. CORREÇÃO DA PROPRIEDADE: Usa 'm.dataNascimento' (camelCase)
+          const dateString = m.dataNascimento;
+          if (!dateString) return false;
+
+          // 3. PARSING SEGURO: Cria a data. 
+          // Adicionando "T00:00:00" garante que a data seja lida como UTC, 
+          // evitando problemas com fusos horários.
+          const d = new Date(dateString + 'T00:00:00');
+
+          // Verifica se a data é válida e se o mês é o atual
+          return !isNaN(d) && d.getMonth() === currentMonth;
+        });
+
+        birthdayListEl.innerHTML = '';
+
+        if (!birthdays.length) {
+          birthdayListEl.innerHTML = '<p class="text-gray-600">Não há aniversariantes este mês.</p>';
+          return;
+        }
+
+        // Ordena por dia do mês
+        birthdays.sort((a, b) => new Date(a.dataNascimento) - new Date(b.dataNascimento));
+
+        birthdays.forEach(b => {
+          // CORREÇÃO DOS NOMES DE PROPRIEDADE (camelCase)
+          const d = new Date(b.dataNascimento + 'T00:00:00');
+          const day = d.getDate();
+          const monthName = d.toLocaleString('pt-BR', { month: 'long' });
+
+          const el = document.createElement('div');
+          el.className = 'p-3 rounded bg-gray-50 flex justify-between';
+
+          // CORREÇÃO: b.nome, b.email, b.numero
+          el.innerHTML = `
+            <div>
+                <strong>${b.nome}</strong>
+                <div class="text-sm text-gray-600">${b.email || ''} • ${b.numero || ''}</div>
+            </div>
+            <div class="text-sm">
+                ${day} de ${monthName}
+            </div>
+        `;
+          birthdayListEl.appendChild(el);
+        });
+      }
+
+      // ATENÇÃO: Se você não tiver uma função formatBR para formatar a data
+      // (como sugeri na correção anterior para a lista de membros), 
+      // adicione esta função para o campo 'dataNascimento' aparecer de forma amigável:
+      function formatBR(dateString) {
+        if (!dateString) return '';
+        try {
+          // Assume formato YYYY-MM-DD
+          const [year, month, day] = dateString.split('-');
+          return `${day}/${month}/${year}`;
+        } catch (e) {
+          return dateString;
+        }
+      }
+
+      /*************************************************************************
+       * Utils & Init
+       **************************************************************************/
+
+      function renderAll() {
+        renderProgram(); renderMembers(); renderBirthdays(); renderPhotos();
+      }
+
+      // initial sample data (only if no data)
+      (function seedIfEmpty() {
+        if (!readJSON(STORAGE_ALBUMS).length) {
+          // no seed by default - admin can add sample via button
+        }
+        if (!readJSON(STORAGE_PROGRAM).length) {
+          const sampleProg = [
+            { day: 'Domingo', time: '08:00', title: 'Culto de Domingo', description: 'Louvor e Palavra' },
+            { day: 'Quarta', time: '19:30', title: 'Quarta de Oração', description: 'Tempo de busca' }
+          ];
+          writeJSON(STORAGE_PROGRAM, sampleProg);
+        }
+        if (!readJSON(STORAGE_MEMBERS).length) {
+          // do not seed members (avoid dummy Ana)
+        }
+      })();
+
+      // initial render
+      window.addEventListener('load', () => { setAdminMode(false); renderAll(); });
+
+      // logout button
+      document.getElementById('btnAdminLogout')?.addEventListener('click', () => {
+        setAdminMode(false); alert('Logout efetuado'); location.reload();
+      });
+
+
+
+    </script>
+  </div>
+
+  <div id="discipleship-container" class="discipleship-container hidden">
+    <script>
+
+      const mainSiteContainer = document.getElementById('main-site');
+      const discipleshipContainer = document.getElementById('discipleship-container');
+      const startDiscipleshipBtn = document.getElementById('start-discipleship-btn');
+      const backToMainSiteBtn = document.getElementById('back-to-main-site-btn');
+      
+
+
+      startDiscipleshipBtn.addEventListener('click', () => {
+        // ... (Verifique se mainSiteContainer e discipleshipContainer não são null) ...
+
+        // Abertura: remove 'hidden'
+        discipleshipContainer.classList.remove('hidden');
+
+        mainSiteContainer.classList.add('hidden');
+        window.scrollTo(0, 0);
+        populateMenu();
+        renderLesson(0);
+      });
+
+      backToMainSiteBtn.addEventListener('click', () => {
+        discipleshipContainer.classList.add('hidden');
+        mainSiteContainer.classList.remove('hidden');
+        window.scrollTo(0, 0);
+      });
+
+
+      const mobileMenuButton = document.getElementById('mobile-menu-button');
+      const mobileMenu = document.getElementById('mobile-menu');
+      mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+      const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+      for (let link of mobileMenuLinks) {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.add('hidden');
+        });
+      }
+
+
+      function reveal() {
+        var reveals = document.querySelectorAll(".reveal");
+        for (var i = 0; i < reveals.length; i++) {
+          var windowHeight = window.innerHeight;
+          var elementTop = reveals[i].getBoundingClientRect().top;
+          var elementVisible = 150;
+          if (elementTop < windowHeight - elementVisible) {
+            reveals[i].classList.add("active");
+          } else {
+            reveals[i].classList.remove("active");
+          }
+        }
+      }
+      window.addEventListener("scroll", reveal);
+      reveal();
+
+      const lessons = [
+        {
+          title: "Carta de Boas-Vindas",
+          content: `
                     <h2 class="text-3xl font-bold text-gray-900 mb-4">Carta de Boas-Vindas </h2>
                     <p class="mb-4 text-lg">Paz seja convosco,</p>
                     <p class="mb-4 text-lg">Que alegria imensa ter você conosco! Saiba que a sua decisão de aprofundar-se na Palavra e na *Declaração de Fé da Igreja do Evangelho Quadrangular* é um passo valioso e que o céu celebra.</p>
@@ -425,11 +1376,11 @@
 
                     <p class="font-semibold text-lg">Com amor,<br>Dos seus Pastores,<br>Pr. Deywson e Pra Sonia Andrade</p>
                 `
-            },
-            {
-                title: "Denominação",
-                objective: "A VISÃO QUADRANGULAR:",
-                content: `
+        },
+        {
+          title: "Denominação",
+          objective: "A VISÃO QUADRANGULAR:",
+          content: `
                     <p class="mb-4 text-lg">O termo Quadrangular é um termo bíblico usado para o Tabernáculo, no livro de Êxodo; para o Templo do Senhor, em Ezequiel 40:47; e para o Céu, no livro de Apocalipse. O termo "Evangelho Quadrangular" foi dado à fundadora Aimée Semple McPherson em inspiração pelo avivamento, durante uma campanha evangelística em Oakland, Califórnia, no ano de 1922, enquanto pregava sobre a visão de Ezequiel (Ez 1:1-10).</p>
 
                     <p class="mb-4 text-lg">"Evangelho Quadrangular" representa aquilo que é igualmente equilibrado por todos os lados, estabelecido e resistente. Tal confiança no poder do evangelho é expressa em Hebreus 13:8, o que é apresentado nas igrejas quadrangulares como "Jesus Cristo é o mesmo ontem, hoje e será eternamente".</p>
@@ -468,11 +1419,11 @@
                     </ul>
 
                 `
-            },
-            {
-                title: "Lição 1: AS SAGRADAS ESCRITURAS",
-                
-                content: `
+        },
+        {
+          title: "Lição 1: AS SAGRADAS ESCRITURAS",
+
+          content: `
                     
                     <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que a Bíblia Sagrada é a</h3>
                     <p class="mb-4"> (1) Palavra do Deus Vivo; Verdadeira, imutável, firme, inabalável, como seu autor, o Senhor Jeová; que foi escrita por santos homens do passado, </p>
@@ -485,466 +1436,596 @@
                     <p class="mb-4">(8) o divino, supremo e eterno tribunal por cujos padrões todos os homens, nações, credos e argumentos serão julgados</p>
                     
                 `,
-                questions: [
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 2: A DIVINDADE ETERNA",
-                
-                content: `
-                    <p class="mb-4"> texto </p>
+          questions: [
+            "Havendo Deus antigamente falado muitas vezes, e de muitas maneiras, aos pajs, pelos profetas... (Hebreus 1:1).",
+            "Porque a profecia nunca foi produzida por vontade dos homens, mas os homens da parte de Deus falaram movidos pelo Espírito Santo.( II Pedro 1:21).",
+            "Lâmpada para meus pés é a tua palavra, e luz para o meu caminho. (Salmos 119:105).",
+            "Porque a palavra de Deus é viva e eficaz, e mais cortante do que qualquer espada de dois gumes, e penetra até a divisão de alma e espírito, e de juntas e medulas, e é apta para discernir os pensamentos e intenções do coração. (Hebreus 4:12).",
+            "Tomai também o capacete da salvação, e a espada do Espírito, que é a palavra de Deus; ( Efésios 6:17).",
+            "Toda escritura é divinamente inspirada e proveitosa para ensinar, para repreender, para corrigir, para instruir em justiça; ( II Timóteo 3:16).",
+            "Quem subirá ao monte do Senhor, ou quem estará no lugar santo? Aquele que é limpo de mãos e puro de coração; que não entrega a sua alma à vaidade, nem jura enganosamente. Este receberá do Senhor uma bênção, e a justiça do Deus da sua salvação. (salmos 24:3-5).",
+            "Escondi a tua palavra no meu coração, para não pecar contra ti, (salmos 119:11).",
+            "Mas que diz? A palavra está perto de ti, na tua boca e no teu coração; isto é a palavra da fé, que pregamos. Porque, se com tua boca confessares a Jesus como Senhor, e em teu coração creres que Deus o ressuscitou dentre os mortos, será salvo; pois é com o coração que se crê para a justiça, e com a boca se faz confissão para a salvação. Porque a Escritura diz: Ninguém que nele crê será confundido. (Romanos 10:8-11).",
+            "Bem-aventurado aquele que lê e bem-aventurados os que ouvem as palavras desta profecia e guardam as coisas que nela estão escritas; porque o tempo está próximo. (Apocalipse 1:3)",
+            "",
+            "",
+            ""
+
+          ]
+        },
+        {
+          title: "Lição 2: A DIVINDADE ETERNA",
+
+          content: `
+                                        
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que só há</h3>
+                    <p class="mb-4">(1) um Deus vivo e verdadeiro:  </p>
+                    <p class="mb-4">(2) autor do céu e da terra e tudo o que neles há; o alfa e o ômega; que sempre foi, é, e será pelos tempos sem fim, amém; que ele é infinitamente santo, poderoso, terno, amoroso e glorioso; </p>
+                    <p class="mb-4">(3) digno de todo amor e honra e obediência, majestade, domínio e poder, assim agora e para sempre; e que a unidade da Divindade se constitui triplicemente em consonância perfeita, executando funções distintas mas harmoniosas, no grande trabalho da redenção: </p>
+                    <p class="mb-4">A) O Pai - (4)Cuja glória é tão indescritível que o homem mortal não pode contemplar Sua face e ainda viver, mas, cujo coração foi tão transbordante de amor e piedade pelos homens perdidos e vítimas do pecado que, </li></p>
+                    <p class="mb-4"(5)Ele, voluntariamente, deu Seu Filho Unigênito, para redimí-los e reconciliá-los consigo mesmo.</p>
+                    <p class="mb-4">B) O Filho - (6)Co-existente e Co-eterno com o Pai que,</p>
+                    <p class="mb-4">(7)concebido pelo Espírito Santo e nascido da Virgem Maria,</p>
+                    <p class="mb-4">(8)assumiu a forma de homem, suportou nossos pecados, e levou nossas tristezas e, pelo derramamento de Seu precioso sangue sobre a cruz do calvário, adquiriu a redenção para todos os que n'Ele creiam; então</p>
+                    <p class="mb-4">(9)quebrando os grilhões da morte e do inferno levantou-se da sepultura e subiu às alturas levando cativo o cativeiro, para que, como o</p>
+                    <p class="mb-4">(10)grande Mediador entre Deus e o homem, pudesse estar à direita do Pai intercedendo por aqueles por quem entregou a sua vida.</p>
+                    <p class="mb-4">C) O Espírito Santo - (11)A terceira Pessoa da Divindade, o Espírito do Pai derramado, Oniciente, Onipotente, Onipresente, realizando uma missão indizivelmente importante sobre a terra</p>
+                    <p class="mb-4">(12)convencendo de pecado, de justiça e de juízo, levando pecadores ao Salvador, rogando, buscando, confortando, guiando, vivificando, glorificando, selando, enchendo ungindo, batizando e revestindo de</p>
+                    <p class="mb-4">(13)poder do alto a todos àqueles que se entregam às suas sagradas ministrações, preparando-os para o grande dia do </p>
+                    
                     <blockquote class="border-l-4 border-red-500 pl-4 py-2 my-4 bg-red-50 text-gray-700">
                         “Se com a tua boca confessares ao Senhor Jesus, e em teu coração creres que Deus o ressuscitou dentre os mortos, serás salvo.” (Romanos 10:9).
                     </blockquote>
                 `,
-                questions: [
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 3: A QUEDA DO HOMEM",
-                
-                content: `
-                    <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
-                    "",
+          questions: [
+            " Respondeu Jesus: O primeiro é: Ouve, Israel, o senhor nosso Deus é o único Senhor. (Marcos 12:29). Ao que lhe disse o escriba: Muito bem, Mestre; com verdade disseste que ele é um, e fora dele não há outro; (Marcos 12:32.) Assim diz o Senhor: Rei de Israel, seu Redentor, o Senhor dos exércitos: Eu sou o primeiro e Eu sou o último e além de mim não há deus. (Isaías 44:6.)",
+            "Porque nele foram criadas todas as coisas nos céus e na terra, as visíveis e as invisíveis, sejam tronos, sem dominações, sem principados, sejam potestades; tudo foi criado por ele e para ele.( Col 1:16). Antes que nascessem montes, ou que tivesses formado a terra e o mundo, sim, de eternidade a eternidade tu és Deus. (SI 90:2). Eu sou o Alfa e o Ômega, diz o Senhor Deus, aquele que é, e que era, e que há de vir, o Todo-poderoso. (Apc 1:8).",
+            "Os quatro seres vivente tinham, cada um seis asas, e ao redor e por dentro estavam cheios de olhos; e não têm descanso nem de noite, dizendo: Santo, Santo é o Senhor Deus, Todo-Poderoso, aquele que era, e que é, e que há de vir. (Apc. 4:8.)",
+            "É disse mais: Não poderá ver a minha face, porquanto homem nenhum pode ver a minha face e viver.( Ex 33:20).",
+            "Porque Deus amou o mundo de tal maneira que deu seu Filho unigênito, para que todo aquele que nele crê não pareça, mas tenha a vida eterna. (Jo 3:16.) No principio era o Verbo, e o Verbo estava com Deus, e o Verbo era Deus. Jo 1:1 Respondeu - lhe Jesus: Em verdade, em verdade vos digo que antes que Abraão existente, eu sou. (Jo. 8:58.)",
+            "E, projetando ele isso, eis que em sonho lhe apareceu um anjo do Senhor, dizendo: José, filho de Davi, não temas receber a Maria, tua mulher, pois o que nela se gerou é do Espírito é do Espírito Santo; (Mt.1:20.)",
+            "Verdadeiramente ele tomou sobre si as nossas enfermidades, e carregou com as nossas dores; e nós o reputávamos por aflito, ferido de Deus, e oprimido. Mas ele foi ferido por causa das nossas transgressões, e esmagado por causa das nossas iniqüidades; o castigo que nos traz a paz estava sobre ele, e pelas suas pisaduras fomos sarados. (Isaias 53:4-5.)",
+            "e o que vivo: fui morto, mas eis aqui estou vivo pelo séculos dosséculos; e tenho as chaves da morte e do inferno. (Apoc. 1:18.)",
+            "Mas o fim desta admoestação é o amor que procede de um coração puro, de uma boa consciência, e de uma fé não fingida;( I Tim 1:5.)",
+            "E o Espírito é o que dá testemunho, porque o Espírito é a verdade.( IJo 5:7.)",
+            "Quando vier o Consolador, que eu vos enviarei da parte do Pai, oEspírito da verdade, que do Pai procede, esse dará testemunho de mim;(Jo 15:26. )E quando ele vier, convencerá o mundo do pecado, da justiça e do juízo;( Jo 16:8.)",
+            "Mas recebereis poder, ao descer sobre vós o Espírito Santo, e ser-me- eis testemunhas, tanto em Jerusalém, como em toda a Judéia e Samária, e até os confins da terra. (Atos 1:8.)",
+            ""
 
-                    "",
-                    "",
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 4: O PLANO DE REDENÇÃO",
-                
-                content: `
-                    <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
-                    "",
+          ]
+        },
+        {
+          title: "Lição 3: A QUEDA DO HOMEM",
 
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 5: SALVAÇÃO PELA GRAÇA",
-                
-                content: `
-                    <p class="mb-4"> texto </p>
+          content: `
+                    
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que o homem foi </h3>
+                    <p class="mb-4"> (1) criado à imagem de Deus, diante de quem Ele andava em santidade e pureza mas que, por voluntária </p>
+                    <p class="mb-4">(2) desobediência e transgressão, caiu da pureza e da inocência do Éden às profundezas do pecado e iniquidade, e que, em consequências disso,</p>
+                    <p class="mb-4">(3) toda humanidade é constituída de pecadores vendidos a Satanás - </p>
+                    <p class="mb-4">(4) pecadores por escolha, caracterizados pela iniquidade e inteiramente desprovidos por natureza, daquela santidade exigida pela lei de Deus, decididamente inclinados ao mal,</li></p>
+                    <p class="mb-4"> (5) culpados e sem justificativa, justamente merecendo a condenação de um Deus justo e Santo.</p>
+                   
                 `,
-                questions: [
-                    "",
+          questions: [
+            "Criou, pois, Deus o homem à sua imagem; à imagem de Deus o criou; homem e mulher os criou.( Gen 1:27.)",
+            "Porque, assim como pela desobediência de um só homem muitos foram constituídos pecadores, assim também pela obediência de um muitos serão constituídos justos.( Rom 5:19.)",
+            "Portanto, assim como por um só homem entrou o pecador no mundo, e pelo pecado a morte, assim também a morte passou a todos os homens, porquanto todos pescaram. (Rom 5:12.)",
 
-                    "",
-                    "",
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 6: ARREPENDIMENTO E ACEITAÇÃO",
-                
-                content: `
-                    <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
-                    "",
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 7: O NOVO NASCIMENTO",
-                
-                content: `
-                    <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
+            "Eis que eu nasci em iniquidade, e em pecado me concebeu minha mãe. (SI 51:5.)",
+            "Pois os seus atributos invisíveis, o seu eterno poder e divindade, são claramente vistos desde a criação do mundo, sendo percebidos mediante as coisas criadas, de modo que eles são inescusáveis; (Rom 1:20.)",
+            ""
 
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 8: VIDA CRISTÃ DIÁRIA",
-                
-                content: `
-                    <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
-                    "",
-                    "",
+          ]
+        },
+        {
+          title: "Lição 4: O PLANO DE REDENÇÃO",
 
-                                 
-                ]
-            },
-            {
-                title: "Lição 9: BATISMO E SANTA CEIA",
-                
-                content: `
-                    <p class="mb-4"> texto </p>
+          content: `
+
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que</h3>
+                    <p class="mb-4"> (1) sendo nós pecadores,Cristo morreu por nós - o Justo pelo</p>
+                    <p class="mb-4">(2) injusto - espontaneamente, e por eleição do Pai, tomando o lugar de pecadores, levando nossos pecados, recebendo nossa condenação, morrendo nossa morte,</p>
+                    <p class="mb-4">(3) pagando inteiramente nossas faltas, e assinando, com o sangue de sua vida, o perdão de todos aqueles que haveriam de n'Ele crer; que, </p>
+                    <p class="mb-4">(4) simplesmente pela fé, a aceitação da expiação adquirida no Monte do Calvário, </li></p>
+                    <p class="mb-4"> (5) o mais vil pecador pode ser limpo de suas iniquidades e tornado mais branco do que a neve.</p>
+                   
+                `,
+          questions: [
+            "Ele foi ferido pelas nossas transgressões, e moído pelas nossas iniqüidade; o castigo que nos traz a paz estava sobre ele, e pelas suas pisadura fomos sarados.( Is. 53:5.)",
+            "O qual se deu a si mesmo por nós para nos remir de toda a iniquidade, e purificar para si um povo seu especial, zeloso de boas obras.(Tt, 2:14.)",
+            "E cantavam um cântico novo, dizendo: Digno és de tomar o livro, e de abrir os seus selos; porque foste morto, e com o teu sangue compraste para Deus homens de toda tribo, e língua, e povo e nação; (Apc 5:9.)",
+
+            "Porque pela graça sois salvos, por meio da fé e isto vem de vós; é dom de Deus; (Efésios 2:8.)",
+            "Vinde então, e argüi-me, diz o senhor: ainda que os vossos pecados sejam vermelhos como o carmesim, se tornarão como a branca lã. (Isaías1:18.)"
+
+          ]
+        },
+        {
+          title: "Lição 5: SALVAÇÃO PELA GRAÇA",
+
+          content: `
+
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que a</h3>
+                    <p class="mb-4">(1) salvação dos pecadores é inteiramente pela graça, que não temos justiça alguma ou bondade em nós mesmos, por onde procurar o divino amparo, havendo que</p>
+                    <p class="mb-4">(2) lançarmo-nos, portando, à inabalável misericórdia e amor daquele que nos comprou e nos lavou no seu próprio sangue, </p>
+                    <p class="mb-4">(3) clamando os méritos e a justiça de Cristo o Salvador, firmados na sua palavra e</p>
+                    <p class="mb-4">(4) aceitando o livre dom de seu amor e perdão.</li></p>
+                                       
+                `,
+          questions: [
+            "Deus, porém, rico em misericórdia, pelo grande amor com que nos amou, e estando nós morto por nossos pecados, deu-nos vida por Cristo - pela graça fostes salvos! (Ef 2:45). Pela graça sois salvos. (Ef. 2:8.)",
+
+            "De agora em diante, pois, já não há condenação alguma paraaqueles que estão em Jesus Cristo.( Rm 8:1.)",
+            "Eu vivo, mas já não sou eu, é Cristo que vive em mim. Minha vida presente na carne, eu a vivo pela fé no Filho de Deus, que me amou e se entregou por mim. (Gal 2;20.)",
+            "Pois o salário do pecado é a morte, enquanto a graça de Deus é avida eterna em Jesus Cristo Nosso Senhor.( Rm. 6:23.)"
+
+          ]
+        },
+        {
+          title: "Lição 6: ARREPENDIMENTO E ACEITAÇÃO",
+
+          content: `
+
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que</h3>
+                    <p class="mb-4">(1)pelo sincero arrependimento, verdadeira tristeza pelo pecado, e verdadeira aceitação do coração para com o Senhor Jesus Cristo, aqueles que O invocam</p>
+                    <p class="mb-4">(2)são justificados pela fé, através do seu precioso sangue e que,</p>
+                    <p class="mb-4">(3)em vez da condenação,</p>
+                    <p class="mb-4">(4)obtém a mais bendita paz, segurança e amparo com Deus; que, com braços abertos de perdão e misericórdia o Salvador espera para receber, em contrição não fingida e </li></p>
+                    <p class="mb-4">(5)súplica por misericórdia todo arrependido que queira abrir a porta do seu coração e aceitá-lo como Senhor e Rei.</p>
+                   
+                `,
+          questions: [
+            "Se confessarmos os nossos pecados, ele é fiel e justo para nos perdoar os pecados e nos purificar de toda injustiça. I Jo. 1:9.",
+            "Sendo, pois, justificados pela fé, temos paz com Deus, por nosso Senhor Jesus Cristo; pelo qual também temos entrada pela fé a esta graça, na qual estamos firmes e nos gloriamos na esperança da glória deDeus. Rm. 5:1,2.",
+            "Portanto, agora nenhuma condenação há para os que estão em Cristo Jesus, que não andam segundo a carne, mas segundo o Espírito. Rm. 8:1.",
+            "Para dar ao seu povo conhecimento da salvação na remissão dos seus pecados, pelas entranhas da misericórdia do nosso Deus, com que o oriente do alto nos visitou, para alumiar aos que estão assentados em trevas e sombra de morte, a fim de dirigir os nossos pés pelo caminho de paz. Lc. 1:77-79.",
+            "E o que vem a mim, de maneira nenhuma eu o lançarei fora. Jo.6:37."
+
+          ]
+        },
+        {
+          title: "Lição 7: O NOVO NASCIMENTO",
+
+          content: `
+
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que </h3>
+                    <p class="mb-4">a mudança que se efetua no coração e na vida, por ocasião da conversão, é absolutamente real;</p>
+                    <p class="mb-4">(1)que o pecador é então nascido de novo, de maneira gloriosa e transformadora tal,</p>
+                    <p class="mb-4">(2)que as coisas velhas são passadas e tudo se faz novo; de tal modo que coisas anteriores desejadas são agora desprezadas, </p>
+                    <p class="mb-4">(3)enquanto coisas outrora aborrecidas são agora respeitadas e sagradas; e que tendo sido agora</p>
+                    <p class="mb-4">(4)a ele imputada a justiça do redentor e recebido do Espírito de Cristo, novos desejos, novas aspirações, novos interesses e uma nova perspectiva da vida, do tempo e da eternidade, enchem o coração lavado no sangue,</li></p>
+                    <p class="mb-4">(5)de modo tal que o seu desejo se torna, agora, abertamente confessar e servir ao Mestre, sempre procurando as coisas que são de cima.</p>
+                   
+                `,
+          questions: [
+            "Não te admires de eu ter dito: necessário é nascer de novo, Jo 3:7.",
+            "Assim que, se alguém está em Cristo, nova criatura é: as coisasvelhas já passaram; eis que tudo se fez novo. II Co. 5:17.",
+
+            "Se vós fosseis do mundo, o mundo amaria o que era seu mas, porque não sois do mundo, por isso é que o mundo vos aborrece. Jo.15:19.",
+            "Já estou crucificado com Cristo: e vivo, não mais eu, mas cristo vive em mim: e a vida que agora vivo na carne vivo-a na fé do Filho de Deus, o qual me amou e se entregou a si mesmo por mim. Gl. 2:20",
+            " Sendo justificados gratuitamente pela sua graça, pela redenção que há em Cristo Jesus. Ao qual Deus propôs para propiciação pela fe no seu sangue, para demonstrar a sua justiça pela remissão dos pecados dantes cometidos, sob a paciência de Deus. Rm. 3: 24,25",
+            "Bem-aventurado o varão que não anda segundo o conselho dos ímpios, e nem se detém no caminho dos pecadores, nem se assenta na roda dos escarnecedores.Antes tem o seu prazer na lei do Senhor, e na sua lei medita de dia e de noite. SI. 1:1,2",
+            ""
+
+          ]
+        },
+        {
+          title: "Lição 8: VIDA CRISTÃ DIÁRIA",
+
+          content: `
+
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que, </h3>
+                    <p class="mb-4">Cremos que, tendo sido limpos pelo precioso sangue de Jesus Cristo e tendo recebido o testemunho do Espírito Santo na conversão, é desejo de Deus que nos santifiquemos diariamente e nos tornemos participantes de Sua santidade.</p>
+                    <p class="mb-4">Devemos crescer constantemente, tornando-nos cada vez mais fortes na fé, no poder, na oração, no amor e no serviço — primeiramente como crianças desejando leite não falsificado neste mundo.</p>
+                    <p class="mb-4">Depois, como homens fortes vestindo toda a armadura de Deus, marchando avante para novas conquistas em Seu nome, ao abrigo do Seu estandarte de sangue.</p>
+                    <p class="mb-4">Assim, vivemos sempre uma vida paciente, sóbria e não egoísta, segundo Deus, representando um verdadeiro reflexo de Cristo em nós.</p>
+
+                `,
+          questions: [
+            "Porque esta é a vontade de Deus, a vossa santificação. I Ts. 4:3. E o mesmo Deus de paz vos santifique em tudo, e todo o vosso espírito e alma e corpo sejam plenamente conservados irrepreensíveis para a vinda de nosso Senhor Jesus Cristo. TS. 5:23",
+            "Ora, amados, pois que temos tais promessas, purifiquemo-nos de toda a imundícia da carne e do espírito, aperfeiçoando a santificação no temor do Senhor. Il Co. 7:1",
+            "Mas a vereda dos justos é como a luz da aurora, que vai brilhando mais e mais até ser dia perfeito. Pv. 4:18",
+            "Pelo que, deixando os rudimentos da doutrina de Cristo, prossigamos até a perfeição. Hb.6:1",
+            "Porque os que são segundo a carne, inclinam-se para as coisas da carne; mas os que são segundo o Espírito para as coisas do Espírito. Rm. 8:5",
+            "E ali haverá um alto caminho, um caminho que se chamará o caminho santo. O imundo não passará por ele, mas será para aqueles: os caminhantes, até mesmo os loucos, não errarão. Is. 35:8 (I Pe. 2:2)."
+
+
+          ]
+        },
+        {
+          title: "Lição 9: BATISMO E SANTA CEIA",
+
+          content: `
+
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que, </h3>
+                    <p class="mb-4">o batismo nas águas, em nome do Pai e do Filho e do Espírito Santo, de acordo com o mandamento de nosso Senhor, é um sagrado sinal exterior de uma obra interior; um belo e solene símbolo a lembrar-nos de que, assim como nosso Senhor morreu sobre a cruz do Calvário, assim também contamo-nos como mortos para o pecado, e a velha natureza com ele pregada no madeiro.</p>
+                    <p class="mb-4">E que, assim como ele foi descido do madeiro e sepultado, assim nós somos sepultados com ele pelo batismo da morte — para que, assim como Cristo foi levantado dentre os mortos pela glória do Pai, assim também andemos em novidade de vida.</p>
+                    <p class="mb-4">Cremos na comemoração e observância da ceia do Senhor pelo sagrado uso do pão partido, um precioso tipo de Pão da Vida — Jesus Cristo, cujo corpo foi partido por nós; e da seiva da videira — um maravilhoso tipo a lembrar sempre o participante do sangue derramado pelo Salvador, que é a videira verdadeira, da qual seus filhos são as varas.</p>
+                    <p class="mb-4">Cremos ainda que esta ordenança é como um glorioso arco-íris a transpor a amplidão do tempo entre o Calvário e a vinda do Senhor, quando, no Reino do Pai, ele compartilhará novamente da companhia de seus filhos; e que o servir e o receber este sagrado sacramento deve ser sempre precedido pelo mais solene exame do coração, autocrítica, perdão e amor para com todos os homens, para que ninguém participe indevidamente e beba condenação para sua própria alma.</p>
                     
                 `,
-                questions: [
-                    "",
-                    "",
+          questions: [
+            "Portanto ide, ensinai todas as nações, batizando-os em nome do Pai, do Filho e do Espírito Santo. Mt. 28:19 (também At. 10:47,48, GI. 3:27,28)",
+            "De sorte que fomos sepultados com ele pelo batismo na morte, para que, como Cristo ressuscitou dos mortos, pela glória do Pai, assim andemos nós também em novidade de vida. Rm. 6:4 (Também Cl. 2:12; 1 Pe. 3:20,21; At. 22:16) De sorte que foram batizados os que de bom grado receberam a sua palavra; e naquele dia agregaram-se quase três mil almas. At. 2:41 (Também Mt. 28:19,20)", ,
+            "Porque todas as vezes que comerdes este pão e beberdes este cálice anunciais a morte do Senhor, até que venha. | Co. 11:26. Examine-se pois o homem a si mesmo, e assim coma deste pão e beba deste cálice. I Co. 11:28 e II Co. 13:5"
 
-                                 
-                ]
-            },
-            {
-                title: "Lição 10: BATISMO NO ESPÍRITO SANTO",
-                
-                content: `
-                    <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 11:A VIDA CHEIA DO ESPÍRITO SANTO",
-                
-                content: `
-                   <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
-                    "",
- 
-                                 
-                ]
-            },
-            {
-                title: "Lição 12: OS DONS E FRUTOS DO ESPÍRITO",
-                
-                content: `
-                    <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 13: MODERAÇÃO",
-               
-                content: `
-                   <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
-                    "",
 
-                                 
-                ]
-            },
-            {
-                title: "Lição 14: CURA DIVINA",
+          ]
+        },
+        {
+          title: "Lição 10: BATISMO NO ESPÍRITO SANTO",
+
+          content: `
                 
-                content: `
-                    <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que, </h3>
+                    <p class="mb-4">o batismo no Espírito Santo é o recebimento do prometido Consolador, em poderosa e gloriosa plenitude, a fim de revestir o crente com poder do alto; para glorificar e exaltar o Senhor Jesus; para dar uma palavra inspirada em testemunho dEle; para promover o espírito de oração, santificação e sobriedade; para capacitar o indivíduo e a igreja a ganhar almas de maneira eficiente, prática, alegre e cheia do Espírito.</p>
+                    <p class="mb-4">Cremos também que, sendo esta ainda a dispensação do Espírito Santo, o crente tem todo direito de esperar o seu recebimento da mesma maneira pela qual o receberam judeus e gentios igualmente nos dias bíblicos, conforme registrado na Palavra, de modo que possa ser dito de nós o que foi dito da casa de Cornélio: “o Espírito Santo caiu sobre eles”, no princípio, assim como em nós agora.</p>
 
-                                 
-                ]
-            },
-            {
-                title: "Lição 15: A SEGUNDA VINDA DE CRISTO",
+                    `,
+          questions: [
+            "E eu rogarei ao Pai, e ele vos dará outro Consolador, para que fique convosco para sempre; o Espírito de Verdade, que o mundo não pode receber, porque não o vê nem o conhece; mas vós o conheceis, porque habita convosco, e estará em vós. Jo.14:16,17",
+            "Porque, na verdade, João batizou com água. Mas vós sereis batizados com o Espírito Santo... Mas recebereis a virtude do Espírito Santo, que há de vir sobre vós; e ser-me-eis testemunhas, tanto em Jerusalém como em toda a Judéia e Samaria, e até aos confins da terra. At. 1:5,8",
+            "E todos foram cheios do Espírito Santo, e começaram a falar noutras línguas, conforme o Espírito lhes concedia que falassem. At. 2:4",
+            "Então lhes impuseram as mãos e receberam o Espírito Santo. At. 8:17",
+            "e dizendo Pedro ainda estas palavras, caiu o Espírito Santo sobre todos os que ouviram a palavra. E os fiéis que eram da circuncisão, todos quantos tinham vindo com Pedro, maravilharam-se de que o dom do Espírito Santo de derramasse também sobre os gentios. Porque os ouviam falar em línguas, e magnificar a Deus.At. 10:44-46",
+            "E, impondo-lhes as mãos, veio sobre eles o Espírito Santo; e falavam línguas e profetizavam. At. 19:6. Não sabeis vós que sois o templo de Deus, e que o Espírito de Deus habita em vós? I Co. 3:16"
+
+
+          ]
+        },
+        {
+          title: "Lição 11:A VIDA CHEIA DO ESPÍRITO SANTO",
+
+          content: `
                 
-                content: `
-                    <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
-                    "",
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que, </h3>
+                    <p class="mb-4">sendo o Espírito Santo como um vento poderoso e veemente, como línguas de chamas vivas que podem sacudir e convulsionar comunidades inteiras para Deus, ele é também como uma delicada pomba, facilmente ofendido e magoado pela impiedade, frieza, vãs conversações, jactância e espírito de crítica ou julgamento, bem como por pensamentos e ações que desonrem o Senhor Jesus.</p>
+                    <p class="mb-4">Cremos ainda que é vontade de Deus que vivamos e andemos no Espírito, momento a momento, sob o precioso sangue do Cordeiro, pisando respeitosa e suavemente na presença do Rei, sendo pacientes, amorosos, verdadeiros, sinceros, de oração, não murmuradores, estando a tempo e fora de tempo servindo ao Senhor.</p>
 
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 16: RELAÇÕES PARA COM A IGREJA",
+                `,
+          questions: [
+            "E não entristeçais o Espírito Santo de Deus, no qual estais selados para o dia da redenção. Toda a amargura, e ira, e cólera, e gritaria e blasfêmias e toda a malícia seja tirada entre vós. Antes sede uns para com os outros benignos, misericordiosos, perdoando-vos uns aos outros, como também Deus vos perdoou em Cristo. Ef. 4:30-32",
+            "Orando em todo o tempo com toda a oração e súplica no Espírito, e vigiando nisto, com toda a perseverança e súplica por todos os santos. Ef. 6:18",
+            "Rogo-vos pois, irmãos, pela compaixão de Deus, que apresenteis os vossos corpos em sacrifício vivo, santo e agradável a Deus, que é o vosso culto racional. E não vos conformeis com este mundo, mas transformai-vos pela renovação do vosso entendimento, para que experimenteis qual seja a boa, agradável e perfeita vontade de Deus. Rm. 12:1,2",
+            "Aquele que diz que está nele, também deve andar como ele andou. I Jo. 2:6",
+            "Andai em Espírito, e não cumprireis a concupiscência da carne. Se vivemos em Espírito, andemos também em Espírito. Gl. 5:16,25",
+            "Se alguém destruir o templo de Deus, Deus o destruirá; porque o templo de Deus, que sois vós, é santo. I. Co. 3:17"
+
+
+          ]
+        },
+        {
+          title: "Lição 12: OS DONS E FRUTOS DO ESPÍRITO",
+
+          content: `
                 
-                content: `
-                   <p class="mb-4"> texto </p>
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que </h3>
+                    <p class="mb-4">o Espírito Santo tem os seguintes dons a serem concedidos à Igreja crente e fiel ao Senhor Jesus Cristo: a palavra de sabedoria, palavra de conhecimento, fé, operação de maravilhas, dons de curar, profecia, discernimento, línguas, interpretação que, conforme o grau de graça e fé de quem os recebe, são repartidos a cada um diversamente, segundo a vontade do Espírito.</p>
+                    <p class="mb-4">Cremos que eles são dignos de serem mui avidamente desejados e buscados, na ordem e proporção em que mais sejam edificantes e benéficos à Igreja.</p>
+                    <p class="mb-4">Cremos também que o fruto do Espírito — amor, alegria, paz, longanimidade, mansidão, bondade, benignidade, fé, temperança — deve ser manifesto, cultivado e cuidadosamente guardado como adorno resultante de uma vida cheia do Espírito e evidência constante, eloqüente e irrefutável disso.</p>
+
                 `,
-                questions: [
-                    "",
-                    "",
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 17: GOVERNO CIVIL",
+          questions: [
+            "Acerca dos dons espirituais não quero, irmãos, que sejais ignorantes. Portanto, procurai com zelo os melhores dons. | Co. 12:1,31. Mas um só e o mesmo Espírito opera estas coisas, repartindo particularmente a cada um como quer. I Co. 12:11;14:12",
+            "Assim também vós, como desejais dons espirituais, procurai abundar neles, para edificação da igreja. I Co. 14:12. Porque os dons e a vocação de Deus são sem arrependimento. Rm 11:29",
+            "Deu modo que, tendo diferentes dons, segundo a graça que nos é dada, se é profecia, seja ela segundo a medida da fé; se é ministério, seja em ministrar; se é ensinar, haja dedicação ao ensino; ou o que exorta, use esse dom em exortar; o que reparte, faça-o com liberalidade; o que preside, com cuidado; o que exercita misericórdia, com alegria. Rm. 12:6-8",
+            "Nisto é glorificado meu Pai, que deis muito fruto; e assim sereis meus discípulos. João 15:8",
+            "E também já está posto o machado à raiz das árvores; toda a árvore, pois, que não dá bom fruto, corta-se e lança-se ao fogo. Lc. 3:9",
+            "Rogo-vos pois, irmãos, pela compaixão de Deus, que apresenteis os vossos corpos em sacrifício vivo, santo e agradável a Deus, que é o vosso culto racional. E não vos conformeis com este mundo, mas transformai-vos pela renovação do vosso entendimento, para que experimenteis qual seja a boa, agradável e perfeita vontade de Deus. Rm. 12:1,2",
+            "Aquele que diz que está nele, também deve andar como ele andou. I Jo. 2:6",
+            "Andai em Espírito, e não cumprireis a concupiscência da carne. Se vivemos em Espírito, andemos também em Espírito. Gl. 5:16,25",
+            "Se alguém destruir o templo de Deus, Deus o destruirá; porque o templo de Deus, que sois vós, é santo. I. Co. 3:17"
+
+          ]
+        },
+        {
+          title: "Lição 13: MODERAÇÃO",
+
+          content: `
+
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que </h3>
+                    <p class="mb-4">a moderação do crente deve ser notória a todos os homens; que sua experiência e proceder diários jamais o levem a extremos, fanatismos, manifestações escandalosas, calúnia, murmurações;</p>
+                    <p class="mb-4">mas que sua sóbria experiência cristã seja de uma firme retidão, sensatez, humildade, auto-sacrifício e conforme a Cristo.</p>
+
+                `,
+          questions: [
+            "Seja a vossa equidade notória a todos os homens. Perto está o Senhor. Fl. 4:5",
+            "Para que não sejamos mais meninos inconstantes, levados em roda por todo o vento de doutrina. Antes, seguindo a verdade em caridade, cresçamos em tudo naquele que é cabeça, Cristo. Ef. 4:14,15",
+            "Caridade não se porta com indecência. I Co. 13:5",
+            "Revesti-vos, pois, como eleitos de Deus, santos e amados, de entranhas de misericórdia, de benignidade, humildade, mansidão longanimidade, suportando-vos uns aos outros, e perdoando-vos uns aos outros; se algum tiver queixa contra o outro, assim como Cristo vos perdoou, assim fazei vós também. Cl. 3:12,13"
+
+
+          ]
+        },
+        {
+          title: "Lição 14: CURA DIVINA",
+
+          content: `
                 
-                content: `
-                    <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
-                    "",
-                    "",
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que </h3>
+                    <p class="mb-4"> a cura divina é o poder do Senhor Jesus Cristo para curar os enfermos e os aflitos, em resposta à oração sincera;</p>
+                    <p class="mb-4">que Ele, sendo o mesmo ontem, hoje e para sempre, jamais mudou; mas é, ainda, um auxílio plenamente suficiente na hora da dor, capaz de saciar as necessidades, vivificar o corpo, a alma e o espírito a uma novidade de vida, em resposta à fé daqueles que oram com submissão à sua vontade divina e soberana.</p>
 
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 18: O JUIZO FINAL",
+                `,
+          questions: [
+            "Ele tomou sobre si as nossas enfermidades e levou as nossas doenças. Mt. 8:17",
+            "Pois qual é mais fácil? Dizer: perdoados te são os teus pecados, ou dizer, levanta-te e anda? Mt. 9:5",
+            "E estes sinais seguirão aos que crerem: em meu nome expulsarão demônios, falarão novas línguas, pegarão nas serpentes; e se beberem alguma coisa mortífera, não lhes fará dano algum; e porão as mãos sobre os enfermos, e os curarão. Mc.16:17,18",
+            "Enquanto estendes a tua mão para curar e para que façam sinais e prodígios pelo nome do teu santo Filho Jesus. At. 4:30",
+            "E a oração da fé salvará o doente, e o Senhor o levantará; e se houver cometido pecados, ser-lhe-ão perdoados. Tg. 5:15"
+
+
+          ]
+        },
+        {
+          title: "Lição 15: A SEGUNDA VINDA DE CRISTO",
+
+          content: `
                 
-                content: `
-                   <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
-                    "",
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que </h3>
+                    <p class="mb-4">a segunda vinda de Cristo é pessoal e iminente; que Ele descerá do céu nas nuvens de glória com voz de arcanjo e com a trombeta de Deus.</p>
+                    <p class="mb-4">E que, nesta hora, a qual ninguém sabe antecipadamente, os mortos em Cristo se levantarão, e os remidos que estiverem vivos serão levados acima, junto com eles, nas nuvens a encontrar o Senhor nos ares, para estarem sempre com o Senhor.</p>
+                    <p class="mb-4">E, vendo nós também que mil anos são como um dia para o Senhor, e que ninguém sabe a hora do seu aparecimento, o qual cremos estar iminente, cada dia deve ser vivido como se Ele fosse esperado aparecer antes de findar o dia.</p>
+                    <p class="mb-4">Todavia, em obediência à sua ordem categórica “trabalhai até que eu venha”, a obra de propagação do Evangelho, o envio de missionários e as obrigações gerais para a edificação da igreja devem ser promovidas tão ampla e diligentemente como se nem a nossa geração nem a vindoura fosse viver em carne para que pudesse ver aquele glorioso dia.</p>
 
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 19: O CÉU",
+                `,
+          questions: [
+            "Porque o mesmo Senhor descerá do céu com alarido, e com voz de arcanjo, e com a trombeta de Deus; e os que morreram em Cristo ressuscitarão primeiro. Depois nós, os que ficarmos vivos, seremos arrebatados juntamente com ele nas nuvens, a encontrar o Senhor nos ares, e assim estaremos sempre com o Senhor. I Ts.4:16,17",
+            "Renunciando a impiedade e às concupiscências mundanas, vivamos nesse presente século sóbria, justa e piamente. Aguardando a bem-aventurada esperança e o aparecimento da glória do grande Deus e nosso Senhor Jesus Cristo. Tt. 2:12,13",
+            "Porém, daquele dia e hora ninguém sabe, nem os anjos do céu, nem o Filho, mas unicamente meu Pai. Vigiai, pois, porque não sabeis a que hora há de vir o vosso Senhor. Mt. 24:36,42,44",
+            "Assim, também Cristo, oferecendo-se uma vez para tirar os pecados de muitos, aparecerá segunda vez, sem pecado, aos que o esperam para salvação. Hb. 9:28",
+            "Negociai até que eu venha. Lc. 19:13",
+            "Estejam cingidos os vossos lombos e acesas as vossas candeias, e sede vós semelhantes aos homens que esperam o seu Senhor, quando houver de voltar das bodas, para que, quando vier, e bater, logo possam abrir-lhe. Bem aventurado aqueles servos, os quais, quando o Senhor vier, achar vigiando! Em verdade vos digo que se cingirá, e os fará assentar à mesa e, chegando-se, os servirá. Le. 12:35-37"
+
+          ]
+        },
+        {
+          title: "Lição 16: RELAÇÕES PARA COM A IGREJA",
+
+          content: `
+
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que, </h3>
+                    <p class="mb-4">tendo aceitado o Senhor Jesus Cristo como Salvador pessoal e Rei, e tendo assim nascido na família e no corpo invisível da Igreja do Senhor, é sagrado dever do crente, quanto esteja em seu poder, identificar-se com a visível Igreja de Cristo sobre a terra, e trabalhar com o maior entusiasmo pela edificação do Reino de Deus.</p>
+                    <p class="mb-4">E que essa Igreja visível é uma congregação de crentes que se têm associado entre si, em cristã comunhão e na unidade do Espírito, a observar as ordenanças de Cristo, adorando-O na beleza da santidade, falando uns aos outros em salmos e hinos e cânticos espirituais, lendo e proclamando sua palavra, trabalhando pela salvação das almas, dando dos seus meios temporais para promover a sua obra, edificando, encorajando e exortando uns aos outros na mais santa fé.</p>
+                    <p class="mb-4">E trabalhando harmoniosamente juntos, como filhos diletos que, embora muitos, são um só corpo, do qual Cristo é o cabeça.</p>
+
+                `,
+          questions: [
+            "Louvai ao Senhor. Louvarei ao Senhor de todo o coração, na assembléia dos justos e na congregação. SI. 111:1",
+            "E consideremo-nos uns aos outros para estimularmos à caridade e as boas obras; não deixando a nossa congregação, como é costume de alguns, antes admoestando-nos uns aos outros e tanto mais, quando vedes que se vai aproximando aquele dia. Hb. 10:24,25",
+            "De sorte que as igrejas eram confirmadas na fé, e cada dia cresciam em número. At. 16:5. E todos os dias acrescentava o Senhor à igreja aqueles que se haviam de salvar. At. 2:47",
+            "Assim nós, que somos muitos, somos um só corpo em Cristo, mas individualmente somos membros uns dos outros. Rm. 12:5 (Também ver Rm. 12:6,7,8)",
+            "Aqueles que temem ao Senhor falam cada um com o seu companheiro, e o Senhor atenta e ouve; e há um memorial escrito diante dele, para os que temem ao Senhor, e para os que se lembram do seu nome. E eles serão para mim particular tesouro; poupa-los-ei como um homem poupa a seu filho, que o serve. Mt. 3:16,17"
+
+          ]
+        },
+        {
+          title: "Lição 17: GOVERNO CIVIL",
+
+          content: `
+
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que </h3>
+                    <p class="mb-4">o governo civil é de indicação divina, para a promoção da boa ordem na sociedade humana e dos interesses da mesma; e que se deva orar pelos governantes e administradores, devendo eles ser obedecidos e apoiados em todo tempo exceto, somente, nas coisas contrárias à vontade de nosso Jesus Cristo, o qual é soberano da consciência do seu povo, Rei dos reis, e Senhor dos Senhores.</p>
+
+                `,
+          questions: [
+            "E as potestades que há foram ordenadas por Deus... porque os magistrados não são terror para as boas obras, mas para as más. Rm. 13:13. (Também Dt. 16:18; IISm. 23:3; Ex. 18:21-23; Jr. 30:21)",
+            "Mais importa obedecer a Deus do que aos homens. At. 5:29. E não temais os que matam o corpo, e não podem matar a alma; temei antes aquele que pode fazer perecer no inferno a alma e o corpo. Mt. 10:28 (Também Dn. 3:15-18; 6:7-10; At.4:18-20)",
+            "Porque um só é o vosso Mestre, que é o Cristo. Mt. 23:10",
+            "E no vestido e na sua coxa tem escrito este nome: rei dos Reis e Senhor dos Senhores. Ap. 19:16. (Também SI. 72:11; SI. 2; Rm. 14:9-13)"
+          ]
+        },
+        {
+          title: "Lição 18: O JUIZO FINAL",
+
+          content: `
+
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que os mortos,</h3>
+                    <p class="mb-4">tanto humildes como poderosos, serão ressuscitados e estarão como os vivos perante o trono de julgamento de Deus; e que, aí, uma solene e terrível separação se dará, em que os maus serão condenados à punição eterna e os justos à vida eterna; e que esse julgamento estabelecerá para sempre o estado final dos homens, no céu ou no inferno, em princípios de justiça, conforme é manifesto na Sua santa Palavra.</p>
+
+                `,
+          questions: [
+            "Porque todos devemos comparecer ante o tribunal de Cristo para que cada um receba segundo o que tiver feito por meio do corpo, ou bem, ou mal. lICo. 5:10",
+            "Mandará o Filho do Homem os seus anjos, e eles colherão do seu reino tudo o que causa escândalo, e os que cometem iniquidade e lançá-los-ão na fornalha de fogo; ali haverá pranto e ranger de dentes. Então os justos resplandecerão como o Sol, no reino do seu Pai. Quem tem ouvidos para ouvir, ouça. Mt. 13:41-43, Hb. 9:27"
+
+          ]
+        },
+        {
+          title: "Lição 19: O CÉU",
+
+          content: `
+
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que o céu</h3>
+                    <p class="mb-4">é a habitação indescritivelmente gloriosa do Deus vivo; e que para lá foi o Senhor a fim de preparar um lugar para seus filhos; que, para essa cidade quadrangular, cujo construtor e realizador é Deus, os crentes mais fervorosos, que lavaram suas vestiduras no sangue do Cordeiro e venceram pela espada do seu testemunho, serão levados.</p>
+                    <p class="mb-4">Cremos que o Senhor Jesus Cristo os apresentará ao Pai, sem manchas ou tristezas; e que lá, em alegria indizível, eles contemplarão para sempre sua face maravilhosa, num reino eterno onde não há trevas, nem necessidade de luz, nem tristeza, nem lágrimas, nem dor, nem morte, mas hostes de anjos servidores dedilham suas harpas, cantam os louvores do nosso Rei e proclamam: "Santo, Santo, Santo".</p>
+
+                `,
+          questions: [
+            "Mas, como está escrito: as coisas que o olho não viu e o ouvido não ouviu, e não subiram ao coração do homem, são as que Deus preparou para os que o amam. ICo. 2:9",
+            "Na casa de meu Pai há muitas moradas; se não fosse assim eu vô-lo teria dito; vou preparar-vos lugar. João 14:2",
+            "E ali não haverá mais noite, e não necessitarão de lâmpada nem de luz do sol, porque o Senhor os alumia; e reinarão para todo o sempre. Ap. 22:4",
+
+            "E Deus limpará de seus olhos toda lágrima; e não haverá mais morte, nem pranto, nem clamor, nem dor, porque já as primeiras coisas são passadas. Ap. 21:4",
+            "Por isso estão diante do trono de Deus, e o servem de dia e de noite no seu templo; e aquele que está assentado sobre o trono os cobrirá com sua sobra. Nunca mais terão fome, nunca mais terão sede; nem sol nem ardor algum cairã sobre eles. Porque o Cordeiro que está no meio do trono os apascentará; e ele servirá de guia para as fontes das aguas de vida; e Deus limpará de seus olhos toda a lágrima. Ap.7:15-17"
+
+          ]
+        },
+        {
+          title: "Lição 20: O INFERNO",
+
+          content: `
+
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que o inferno </h3>                
+                    <p class="mb-4">é um lugar de trevas exteriores e da mais profunda tristeza, onde o verme não morre e o fogo não se apaga; um lugar preparado para o Diabo e seus anjos, onde haverá choro, pranto e ranger de dentes, lugar de amargura e eterno arrependimento por parte daqueles que rejeitaram a misericórdia, o amor e a ternura do Salvador crucificado, escolhendo a morte em vez da vida.</p>
+                    <p class="mb-4">Cremos que ali, em um lago que queima com fogo e enxofre, serão lançados os descrentes, os abomináveis, os criminosos, os feiticeiros, os idólatras, os mentirosos, e todos os que rejeitaram e desprezaram o amor e o sacrifício de um Redentor banhado em sangue, deixando a cruz para sua própria perdição, apesar de toda instância e advertência do Espírito Santo.</p>
+
+                `,
+          questions: [
+            "Mandará o Filho do Homem e seus anjos, e eles colherão do seu reino tudo o que causa escândalo, e os que cometem iniqüidade. E lançá-los-ão na fornalha de fogo; ali haverá pranto e ranger de dentes. Mt. 13:41-42.",
+            "E o diabo, que os enganava, foi lançado no lago de fogo e enxofre, onde esta a besta e o falso profeta; de dia e de noite serao atormentados para todo o sempre. E aquele que não foi achado escrito no livro da vida foi lançado no lago de fogo. Ap.20:10,15",
+
+            "Também o tal beberá do vinho da ira de Deus, que se deitou, não misturado, no cálice da sua ira; e será atormentado com fogo e enxofre diante dos santos anjos e diante do Cordeiro. E o fumo do seu tormento sobe para todo o sempre; e não tem repouso nem de dia nem de noite os que adoram a besta e a sua imagem, e aquele , e aquele que receber o sinal do seu nome. Ap. 14:10,11",
+            "Então dirá também aos que estiverem à sua esquerda: apartai-vos de mim, malditos, para o fogo eterno, preparado para o diabo e seus anjos. Mt. 25:41. E, se a tua mão escandalizar, corta-a; melhor para tia é entrares na vida alijado, do que, tendo duas mãos, ires para o inferno, para o fogo que nunca se apaga, onde o seu bicho não morre, e o fogo nunca se apaga. Mc. 9:43,44.5",
+            "Vivo eu, diz o Senhor Jeová, que não tenho prazer na morte do ímpio, mas que o ímpio se converta do seu caminho e viva. Convertei-vos dos vossos maus caminhos; pois por que razão morrereis, ó casa de Israel? Ez. 33:11"
+
+          ]
+        },
+        {
+          title: "Lição 21: EVANGELISMO",
+
+          content: `
                 
-                content: `
-                    <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
-                    "",
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que, </h3>                
+                    <p class="mb-4">à vista do fato de que todo o presente estado de coisas passará, e que o fim de todas as coisas é iminente, os filhos remidos do Senhor Jeová devem levantar-se e brilhar como uma luz que não pode ser escondida, uma cidade edificada sobre um monte, espalhando o evangelho aos confins da terra, cingindo o globo com a mensagem da salvação e declarando, com zelo e entusiasmo ardentes, todo o conselho de Deus.</p>
+                    <p class="mb-4">Cremos que, quando o Senhor da glória aparecer, eles serão achados de pé, tendo seus lombos cingidos com a verdade, e suas atividades e mistérios serão ricamente recompensados com a abundância de jóias que ganharam e guardaram para Ele — almas preciosas conduzidas das trevas para a luz por meio do instrumento de seu fiel testemunho.</p>
+                    <p class="mb-4">Cremos que ganhar almas é a atividade por excelência da igreja sobre a terra; e que, portanto, toda opressão ou embaraço que vise extinguir a chama ou prejudicar a eficiência na pregação mundial do evangelho deve ser eliminada e não admitida, como indigna da igreja, prejudicial à sacratíssima causa de Cristo e contrária à grande comissão do Senhor.</p>
 
-                    "",
-                    "",
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 20: O INFERNO",
+                `,
+          questions: [
+            "conjuro-te pois, diante de Deus, e do Senhor Jesus Cristo, que há de julgar os vivos e os mortos, na sua vinda e no seu reino, que pregues a palavra, instes a tempo e fora de tempo, redargüas, repreendas, exortes, com toda longanimidade e doutrina.II Tm. 4:1,2",
+            "Remindo o tempo; porquanto os dias são maus. Ef. 5:16",
+            "O que ganha almas sábio é. Pv. 11:30",
+            "Saiba que aquele que fizer converter do erro do seu caminho um pecador, salvará da morte uma alma, e cobrirá uma multidão de pecados. Tg. 5:20",
+            "Filho do homem, eu te dei por atalaia sobre a casa de Israel; e tu da minha boca ouviras a palavra, e os avisarás da minha parte. Quando eu disser ao ímpio: Certamente morrerás; não o avisando tu, não o falando para avisar o ímpio acerca do seu caminho ímpio, para salvar a sua vida, aquele ímpio morrerá na sua maldade, mas o seu sangue da tua mão o requererei. Ez. 3:17,18",
+
+            "Levantai os vossos olhos, e vede as terras, que já estão brancas para a ceifa. E o queia a receb que ceia, anjunta fregozar. Porque eino e verdadeiro o dia, que um é o que semeia, e o outro o que ceifa. Jo. 4:35-37"
+
+          ]
+        },
+        {
+          title: "Lição 22: DÍZIMOS E OFERTAS",
+
+          content: `
                 
-                content: `
-                    <p class="mb-4"> texto </p>
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Cremos que </h3>                
+                    <p class="mb-4">o método estabelecido por Deus para manter o seu ministério e promover a propagação do evangelho, conforme Sua ordem, é o dízimo. Esse princípio é acatado por nossas igrejas internacionalmente, não apenas como método divino para suprir as necessidades materiais e financeiras da igreja, mas também para fortalecer a moral espiritual do seu povo, de modo que Deus, por Sua fidelidade, os abençoe.</p>
+                    <p class="mb-4">Somos ordenados em Ml. 3:10: “Trazei todos os dízimos à casa do tesouro, para que haja mantimento na minha casa; depois fazei prova de mim, diz o Senhor dos Exércitos, se eu não vos abrir as janelas dos céus e não derramar sobre vós uma bênção tal que dela vos advenha a maior abastança.”</p>
+                    <p class="mb-4">No tocante a dar e ofertas voluntárias, isso é ordenado pelo Senhor e praticado em todas as nossas igrejas, internacionalmente, como parte do plano de Deus para atender às necessidades materiais da igreja e satisfazer a espiritualidade do seu povo.</p>
+                    <p class="mb-4">Somos admoestados em Lucas 6:38: “Dai, e ser-vos-á dado; boa medida, recalcada, sacudida e transbordando vos deitarão no vosso regaço; porque com a mesma medida com que medirdes também vos medirão de novo.”</p>
+                    <p class="mb-4">Sendo co-herdeiros com Ele, sabemos que dar para o Seu reino — que também é nosso — é algo agradável, pois é mais bem-aventurado dar do que receber. Assim, somos instruídos em II Co. 9:7: “Cada um contribua segundo propôs no seu coração; não com tristeza ou por necessidade, porque Deus ama ao que dá com alegria.”</p>
+
                 `,
-                questions: [
-                    "",
-                    "",
+          questions: [
+            "",
+            "",
+            "",
 
-                    "",
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 21: EVANGELISMO",
-                
-                content: `
-                    <p class="mb-4"> texto </p>
+            "",
+            ""
+
+          ]
+        },
+        {
+          title: "Lição 23: MEMBROS",
+
+          content: `
+
+                    <h3 class="text-2xl font-bold mb-3 mt-6">Os candidatos a membro devem, </h3>                
+                    <p class="mb-4">primeiramente, ser examinados quanto à sua fé, sendo feita oração juntamente com eles e, nessa ocasião, encorajados em seu propósito. Deve o candidato mostrar evidência de possuir genuína experiência de novo nascimento, ser batizado por imersão em nome do Pai, do Filho e do Espírito Santo, e viver uma vida cristã que sirva de exemplo tanto para pecadores como para convertidos.</p>
+                    <p class="mb-4">É necessário que possua grande desejo de ganhar almas e amor pelo progresso da causa do Evangelho Quadrangular no mundo, devendo declarar sua lealdade a esta associação e sua disposição em auxiliá-la em sua manutenção, tanto com seus recursos particulares quanto com seu esforço pessoal.</p>
+                    <p class="mb-4">Cada candidato deve reconhecer que “uma casa dividida contra si mesma não pode subsistir” e afirmar sua adesão à linha desta associação, para que não haja deslealdade, insubordinação, murmuração, críticas ou calúnias contra a mesma ou contra seus dirigentes.</p>
+                    <p class="mb-4">Se, em algum momento, qualquer membro sentir que não está mais sendo leal ou que perdeu a simpatia para com esta associação, deixando de ser uma voz unânime como antes, deverá pedir uma carta de demissão e retirar-se discretamente do rol de membros. As autoridades da associação reservam-se o direito de induzi-lo a agir dessa forma caso ele demore a tomar tal decisão.</p>
+                    <p class="mb-4">O amor pelas almas e a paixão por ganhá-las devem ser a grande base e o supremo fim de todos os esforços. Ideias marginais, concepções não essenciais e discussões sobre sutilezas doutrinárias — que tendem a quebrar a unidade e a distrair da chama ardente de ganhar almas — devem ser evitadas e refutadas onde quer que apareçam.</p>
+                    <p class="mb-4">Cristo deve ser a figura central a ser mostrada, até que todos os homens O vejam, O amem e se aproximem dEle.</p>
+
                 `,
-                questions: [
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
+          questions: [
+            "",
+            "",
+            "",
+            "",
 
-                    "",
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 22: DÍZIMOS E OFERTAS",
-                
-                content: `
-                    <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
-                    "",
+            "",
+            ""
 
-                    "",
-                    ""
-                                 
-                ]
-            },
-            {
-                title: "Lição 23: MEMBROS",
-                
-                content: `
-                   <p class="mb-4"> texto </p>
-                `,
-                questions: [
-                    "",
-                    "",
-                    "",
-                    "",
+          ]
+        }
+      ];
 
-                    "",
-                    ""
-                                 
-                ]
-            }
-        ];
+      let currentLessonIndex = 0;
+      const contentArea = document.getElementById('content-area');
+      const lessonMenu = document.getElementById('lesson-menu');
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+      const progressIndicator = document.getElementById('progress-indicator');
 
-        let currentLessonIndex = 0;
-        const contentArea = document.getElementById('content-area');
-        const lessonMenu = document.getElementById('lesson-menu');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const progressIndicator = document.getElementById('progress-indicator');
+      function renderLesson(index) {
+        if (index < 0 || index >= lessons.length) return;
+        currentLessonIndex = index;
+        const lesson = lessons[index];
 
-        function renderLesson(index) {
-            if (index < 0 || index >= lessons.length) return;
-            currentLessonIndex = index;
-            const lesson = lessons[index];
-            
-            let html = `<div class="content-fade-in flex-grow">`;
-            if(lesson.title !== "Carta de Boas-Vindas") {
-                html += `<h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">${lesson.title}</h1>`;
-            }
-            if(lesson.objective) {
-                html += `<p class="text-md text-red-600 font-medium mb-6">${lesson.objective}</p>`;
-            }
-            html += `<div class="prose max-w-none text-gray-700 text-lg leading-relaxed">${lesson.content}</div>`;
-            if (lesson.questions) {
-                html += `<div class="mt-10 pt-6 border-t-2 border-gray-200">
+        let html = `<div class="content-fade-in flex-grow">`;
+        if (lesson.title !== "Carta de Boas-Vindas") {
+          html += `<h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">${lesson.title}</h1>`;
+        }
+        if (lesson.objective) {
+          html += `<p class="text-md text-red-600 font-medium mb-6">${lesson.objective}</p>`;
+        }
+        html += `<div class="prose max-w-none text-gray-700 text-lg leading-relaxed">${lesson.content}</div>`;
+        if (lesson.questions) {
+          html += `<div class="mt-10 pt-6 border-t-2 border-gray-200">
                             <h4 class="text-xl font-bold mb-4 text-gray-800">Referências Bíblicas</h4>
                             <ul class="space-y-3 list-decimal list-inside">`;
-                lesson.questions.forEach(q => {
-                    html += `<li class="text-gray-700">${q}</li>`;
-                });
-                html += `</ul></div>`;
-            }
-            html += `</div>`;
-            contentArea.innerHTML = html;
-            updateNavigation();
-            updateMenu();
+          lesson.questions.forEach(q => {
+            html += `<li class="text-gray-700">${q}</li>`;
+          });
+          html += `</ul></div>`;
         }
+        html += `</div>`;
+        contentArea.innerHTML = html;
+        updateNavigation();
+        updateMenu();
+      }
 
-        function updateNavigation() {
-            prevBtn.disabled = currentLessonIndex === 0;
-            nextBtn.disabled = currentLessonIndex === lessons.length - 1;
-            prevBtn.classList.toggle('opacity-50', prevBtn.disabled);
-            prevBtn.classList.toggle('cursor-not-allowed', prevBtn.disabled);
-            nextBtn.classList.toggle('opacity-50', nextBtn.disabled);
-            nextBtn.classList.toggle('cursor-not-allowed', nextBtn.disabled);
-            progressIndicator.textContent = `Lição ${currentLessonIndex + 1} de ${lessons.length}`;
-        }
+      function updateNavigation() {
+        prevBtn.disabled = currentLessonIndex === 0;
+        nextBtn.disabled = currentLessonIndex === lessons.length - 1;
+        prevBtn.classList.toggle('opacity-50', prevBtn.disabled);
+        prevBtn.classList.toggle('cursor-not-allowed', prevBtn.disabled);
+        nextBtn.classList.toggle('opacity-50', nextBtn.disabled);
+        nextBtn.classList.toggle('cursor-not-allowed', nextBtn.disabled);
+        progressIndicator.textContent = `Lição ${currentLessonIndex + 1} de ${lessons.length}`;
+      }
 
-        function updateMenu() {
-            const menuItems = lessonMenu.querySelectorAll('button');
-            menuItems.forEach((item, index) => {
-                if (index === currentLessonIndex) {
-                    item.classList.add('bg-red-100', 'text-red-700', 'font-bold');
-                    item.classList.remove('text-gray-600', 'hover:bg-gray-100');
-                } else {
-                    item.classList.remove('bg-red-100', 'text-red-700', 'font-bold');
-                    item.classList.add('text-gray-600', 'hover:bg-gray-100');
-                }
-            });
-        }
-
-        function populateMenu() {
-            if (lessonMenu.children.length > 0) return; 
-            lessons.forEach((lesson, index) => {
-                const button = document.createElement('button');
-                button.className = 'w-full text-left py-2 px-4 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-gray-100 font-medium';
-                button.textContent = lesson.title;
-                button.onclick = () => renderLesson(index);
-                lessonMenu.appendChild(button);
-            });
-        }
-
-        prevBtn.addEventListener('click', () => {
-            if (currentLessonIndex > 0) renderLesson(currentLessonIndex - 1);
+      function updateMenu() {
+        const menuItems = lessonMenu.querySelectorAll('button');
+        menuItems.forEach((item, index) => {
+          if (index === currentLessonIndex) {
+            item.classList.add('bg-red-100', 'text-red-700', 'font-bold');
+            item.classList.remove('text-gray-600', 'hover:bg-gray-100');
+          } else {
+            item.classList.remove('bg-red-100', 'text-red-700', 'font-bold');
+            item.classList.add('text-gray-600', 'hover:bg-gray-100');
+          }
         });
-        nextBtn.addEventListener('click', () => {
-            if (currentLessonIndex < lessons.length - 1) renderLesson(currentLessonIndex + 1);
-        });
-        
+      }
 
-        startDiscipleshipBtn.addEventListener('click', () => {
-            populateMenu();
-            renderLesson(0);
+      function populateMenu() {
+        if (lessonMenu.children.length > 0) return;
+        lessons.forEach((lesson, index) => {
+          const button = document.createElement('button');
+          button.className = 'w-full text-left py-2 px-4 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-gray-100 font-medium';
+          button.textContent = lesson.title;
+          button.onclick = () => renderLesson(index);
+          lessonMenu.appendChild(button);
         });
+      }
+
+      prevBtn.addEventListener('click', () => {
+        if (currentLessonIndex > 0) renderLesson(currentLessonIndex - 1);
+      });
+      nextBtn.addEventListener('click', () => {
+        if (currentLessonIndex < lessons.length - 1) renderLesson(currentLessonIndex + 1);
+      });
+
+
+      startDiscipleshipBtn.addEventListener('click', () => {
+        populateMenu();
+        renderLesson(0);
+      });
     </script>
+  </div>
 </body>
 
-
+</html>
