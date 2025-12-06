@@ -279,17 +279,22 @@
       <section id="galeria" class="py-8 bg-white rounded-lg p-6 shadow-sm mt-6">
         <div class="flex justify-between items-center mb-4">
           <div>
-            <h2 class="text-2xl font-bold">Mural de Fotos</h2>
-            <p class="text-sm text-gray-600">Registros da Igreja</p>
-          </div>
-          <div id="albumsAdminControls" class="hidden">
-            <button id="btnCreatePhoto" class="bg-green-600 text-white px-3 py-2 rounded mr-2">Adicionar Foto</button>
+            <h2 class="text-2xl font-bold">Nosso Feed do Instagram</h2>
+            <p class="text-sm text-gray-600">Acompanhe nossos registros em tempo real no Instagram.</p>
           </div>
         </div>
 
         <hr class="my-4">
 
-        <div id="masonry" class="masonry"></div>
+        <div id="instagram-feed-container">
+
+          <p class="text-gray-500 text-center p-8">
+            <!-- Elfsight Instagram Feed | Untitled Instagram Feed -->
+            <script src="https://elfsightcdn.com/platform.js" async></script>
+          <div class="elfsight-app-69a46513-9abd-40f1-945f-d9ee870a5d91" data-elfsight-app-lazy></div>
+          </p>
+
+        </div>
       </section>
 
 
@@ -304,7 +309,6 @@
             <input id="xlsxInput" type="file" accept=".xlsx,.xls" class="mb-2" />
             <button id="importXlsxBtn" class="bg-amber-600 text-white px-3 py-2 rounded mr-2">Importar Excel</button>
             <button id="exportCsvBtn" class="bg-gray-100 px-3 py-2 rounded">Exportar CSV</button>
-            <button id="clearMembersBtn" class="bg-red-100 text-red-700 px-3 py-2 rounded ml-2">Limpar (local)</button>
             <p class="text-xs text-gray-500 mt-2">Planilha: Nome, Email, CPF, Telefone, Endereco, DataNascimento</p>
           </div>
 
@@ -376,7 +380,7 @@
       /*************************************************************************
        * Config
        **************************************************************************/
-      const API_BASE_URL = 'http://localhost:8080';
+      const API_BASE_URL = 'https://igrejaapi-latest.onrender.com';
       const STORAGE_ALBUMS = 'ieq_albums';
       const STORAGE_MEMBERS = 'ieq_members';
       const STORAGE_PROGRAM = 'ieq_program';
@@ -524,159 +528,7 @@
       }
       function hideModal() { modalRoot.innerHTML = ''; modalRoot.classList.add('hidden'); }
 
-      /*************************************************************************
-       * ALBUMS CRUD
-       **************************************************************************/
-      const albumListEl = document.getElementById('albumList');
-      const masonryEl = document.getElementById('masonry');
-      const btnCreatePhoto = document.getElementById('btnCreatePhoto');
 
-
-
-      // NOVO: Função para carregar todas as imagens
-      async function loadAllImagesFromAPI() {
-        try {
-          const response = await fetch(`${API_BASE_URL}/imagens`);
-          if (!response.ok) throw new Error('Falha ao carregar imagens.');
-          const images = await response.json();
-          return Array.isArray(images) ? images : [];
-        } catch (e) {
-          console.error('Erro ao carregar mural:', e);
-          return [];
-        }
-      }
-
-      // NOVO: Função para renderizar o Mural de Fotos
-      async function renderPhotos() {
-        const images = await loadAllImagesFromAPI();
-
-        // O elemento de listagem de álbuns já foi removido, só precisamos do masonry
-        masonryEl.innerHTML = '';
-
-        if (!images.length) {
-          masonryEl.innerHTML = '<div class="p-4 text-gray-600">Nenhuma foto no mural.</div>';
-          return;
-        }
-
-        images.forEach(p => {
-          // Usa as novas propriedades: p.titulo e p.descricao
-          const photoHtml = `
-            <div class="masonry-item">
-                <img src="${p.url}" alt="${p.titulo || p.nomeArquivo}">
-                <div class="meta p-3 text-sm text-gray-700">
-                    <h4 class="font-bold text-lg">${p.titulo || 'Sem Título'}</h4>
-                    <p>${p.descricao || p.nomeArquivo}</p>
-                    ${isAdmin ? `<div class='mt-2'><button data-id='${p.id}' class='deletePhotoBtn text-red-600 text-sm'>Excluir foto</button></div>` : ''}
-                </div>
-            </div>
-        `;
-          masonryEl.innerHTML += photoHtml;
-        });
-
-        // Bind do botão de exclusão
-        document.querySelectorAll('.deletePhotoBtn').forEach(btn => {
-          btn.addEventListener('click', async (e) => {
-            const photoId = parseInt(e.target.dataset.id, 10);
-            if (!confirm('Excluir foto do mural?')) return;
-
-            // Assume que deleteImageFromAPI(id) está definido e funciona
-            const success = await deleteImageFromAPI(photoId);
-            if (success) {
-              renderPhotos(); // Recarrega o mural
-            }
-          });
-        });
-      }
-      btnCreatePhoto?.addEventListener('click', () => {
-        if (!isAdmin) { alert('Somente admin'); return; }
-        showModal(`<div class="p-4">
-      <h3 class="text-xl font-bold mb-2">Adicionar Foto ao Mural</h3>
-      <input id="photosTitle" placeholder="Título (para exibir no mural)" class="w-full p-2 border rounded mb-2"/>
-      <textarea id="photosDescription" placeholder="Descrição (para exibir no mural)" class="w-full p-2 border rounded mb-2"></textarea>
-      <input id="photosFiles" type="file" accept="image/*" class="w-full mb-3"/>
-      <div class="flex gap-2"><button id="sendPhotosBtn" class="bg-green-600 text-white px-3 py-2 rounded">Enviar</button><button id="cancelPhotos" class="bg-gray-100 px-3 py-2 rounded">Cancelar</button></div>
-    </div>`);
-
-        document.getElementById('cancelPhotos').addEventListener('click', hideModal);
-        document.getElementById('sendPhotosBtn').addEventListener('click', async () => {
-          const filesEl = document.getElementById('photosFiles');
-          const title = document.getElementById('photosTitle').value.trim();
-          const description = document.getElementById('photosDescription').value.trim();
-
-          if (!filesEl.files || filesEl.files.length === 0) { alert('Selecione uma imagem'); return; }
-
-          const file = filesEl.files[0]; // Permite apenas 1 upload por vez no frontend simplificado
-          const result = await uploadPhotoToAPI(file, title, description);
-
-          hideModal();
-          if (result) {
-            renderPhotos(); // Recarrega o mural
-            alert(`Foto "${title}" enviada com sucesso.`);
-          }
-        });
-      });
-      async function deleteImageFromAPI(id) {
-        if (!isAdmin) {
-          alert('Ação somente para Admin.');
-          return false;
-        }
-
-        // O endpoint DEVE ser ajustado para o novo padrão: DELETE /imagens/{id}
-        try {
-          const response = await fetch(`${API_BASE_URL}/imagens/${id}`, {
-            method: 'DELETE',
-            // Reutiliza o helper que inclui o token JWT
-            headers: getAuthHeaders()
-          });
-
-          if (!response.ok) {
-            // Tenta obter o corpo da resposta em caso de erro para debug
-            const errorText = await response.text();
-            throw new Error(errorText || `Falha ao excluir a imagem (Status: ${response.status})`);
-          }
-
-          // Retorna true para indicar sucesso (204 No Content)
-          alert('Foto excluída da API e do S3.');
-          return true;
-
-        } catch (e) {
-          console.error('Erro ao deletar imagem:', e);
-          alert('Erro ao excluir foto: ' + e.message);
-          return false;
-        }
-      }
-
-      // NOVO: Função de Upload Simples para a API (com Título e Descrição)
-      async function uploadPhotoToAPI(file, title, description, tipo = 'MURAL') {
-        if (!isAdmin) return null;
-
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('tipo', tipo); // Usamos 'MURAL' como tipo padrão
-        formData.append('titulo', title);
-        formData.append('descricao', description);
-
-        try {
-          const response = await fetch(`${API_BASE_URL}/imagens/upload`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${authToken}`
-            },
-            body: formData
-          });
-          // 1. Apenas verifica o sucesso (Status 201 Created)
-          if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Falha no upload (${response.status}): ${errorText}`);
-          }
-
-          // 2. RETORNA TRUE EM VEZ DE TENTAR LER JSON
-          return true;
-        } catch (e) {
-          alert('Erro ao enviar foto: ' + e.message);
-          return null;
-        }
-      }
 
       /*************************************************************************
        * PROGRAM (CRUD) - option B: day, time, description
@@ -778,7 +630,6 @@
                 </div>
                 <div>
                     ${isAdmin ? `
-                        <button data-id="${ev.id}" class="editProgBtn text-yellow-600 mr-2">Editar</button>
                         <button data-id="${ev.id}" class="deleteProgBtn text-red-600">Excluir</button>
                     ` : ''}
                 </div>
@@ -963,7 +814,6 @@
                 </div>
             </div>
             <div>
-                <button data-id="${m.id}" class="editMemberBtn text-yellow-600 mr-2">Editar</button>
                 <button data-id="${m.id}" class="deleteMemberBtn text-red-600">Excluir</button>
             </div>
         `;
@@ -1150,14 +1000,36 @@
       });
 
       // export CSV
-      exportCsvBtn?.addEventListener('click', () => {
-        const members = loadMembers(); if (!members.length) { alert('Nenhum membro'); return; }
-        const header = ['Nome', 'Email', 'CPF', 'Telefone', 'Endereco', 'DataNascimento'];
-        const rows = members.map(m => [m.Nome || '', m.Email || '', m.CPF || '', m.Telefone || '', m.Endereco || '', m.DataNascimento || '']);
-        const csv = [header, ...rows].map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = 'membros.csv'; a.click(); URL.revokeObjectURL(url);
-      });
+exportCsvBtn?.addEventListener('click', async () => {
+    if (!isAdmin) { alert('Ação somente para Admin.'); return; } // Verifica o modo Admin
+
+    // Usa a função assíncrona para carregar os membros da API
+    const members = await loadMembers(); 
+    
+    if (!members.length) { alert('Nenhum membro'); return; }
+    
+    // **CORREÇÃO AQUI:** Usar os nomes das propriedades da API (camelCase)
+    const header = ['Nome', 'Email', 'CPF', 'Telefone', 'Endereco', 'DataNascimento'];
+    const rows = members.map(m => [
+        m.nome || '', 
+        m.email || '', 
+        m.cpf || '', 
+        m.numero || '', // A API retorna 'numero', não 'telefone'
+        m.endereco || '', 
+        m.dataNascimento || '' // Formato YYYY-MM-DD
+    ]);
+
+    const csv = [header, ...rows].map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); 
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a'); 
+    a.href = url; 
+    a.download = 'membros.csv'; 
+    a.click(); 
+    URL.revokeObjectURL(url);
+});
 
       async function deleteMember(id) {
         if (!isAdmin) return alert('Ação somente para Admin.');
@@ -1264,7 +1136,7 @@
        **************************************************************************/
 
       function renderAll() {
-        renderProgram(); renderMembers(); renderBirthdays(); renderPhotos();
+        renderProgram(); renderMembers(); renderBirthdays();
       }
 
       // initial sample data (only if no data)
@@ -1298,13 +1170,60 @@
   </div>
 
   <div id="discipleship-container" class="discipleship-container hidden">
+    <header class="bg-white shadow-md sticky top-0 z-50">
+      <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+        <h1 class="text-xl font-bold text-gray-800">Declaração de Fé</h1>
+        <div class="flex items-center gap-3">
+          <button id="back-to-main-site-btn"
+            class="bg-red-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-red-700">
+            <i class="fas fa-arrow-left mr-2"></i>Voltar ao Site
+          </button>
+          <button id="mobile-menu-button" class="md:hidden text-gray-700">
+            <i class="fas fa-bars fa-lg"></i>
+          </button>
+        </div>
+      </nav>
+      <div id="mobile-menu" class="hidden md:hidden bg-gray-50 border-t">
+        <div id="mobile-lesson-menu" class="p-4 space-y-2">
+        </div>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-10 flex gap-8">
+      <aside class="w-64 hidden md:block flex-shrink-0">
+        <div class="bg-white p-4 rounded-xl shadow-lg sticky top-20">
+          <h3 class="font-bold text-lg mb-4">Índice das Lições</h3>
+          <div id="lesson-menu" class="space-y-1">
+          </div>
+        </div>
+      </aside>
+
+      <section class="flex-grow min-w-0">
+        <div class="bg-white p-8 rounded-xl shadow-lg">
+          <div id="content-area" class="min-h-[400px]">
+          </div>
+
+          <div class="mt-8 pt-4 border-t flex justify-between items-center">
+            <button id="prev-btn"
+              class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition duration-150">
+              <i class="fas fa-chevron-left mr-2"></i>Anterior
+            </button>
+            <span id="progress-indicator" class="text-sm text-gray-600 font-medium">Lição 1 de 23</span>
+            <button id="next-btn"
+              class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition duration-150">
+              Próxima<i class="fas fa-chevron-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
     <script>
 
       const mainSiteContainer = document.getElementById('main-site');
       const discipleshipContainer = document.getElementById('discipleship-container');
       const startDiscipleshipBtn = document.getElementById('start-discipleship-btn');
       const backToMainSiteBtn = document.getElementById('back-to-main-site-btn');
-      
+
 
 
       startDiscipleshipBtn.addEventListener('click', () => {
